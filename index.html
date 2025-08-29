@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Einladung</title>
+<style>
+  :root{
+    /* Einfach anpassen: */
+    --bg: #f3f5f7;
+    --ink: #1a1f36;
+    --accent: #00c2ff;
+    --accent-dark: #0099cc;
+    --envelope: #ffffff;
+    --envelope-shadow: rgba(10,20,40,.12);
+    --card: #ffffff;
+    --card-ink: #102033;
+    --card-shadow: rgba(0,0,0,.14);
+    --radius: 18px;
+    --ease: cubic-bezier(.2,.8,.2,1);
+    --dur-fast: .45s;
+    --dur-med: .8s;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body{
+    margin:0;
+    font: 16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+    color: var(--ink);
+    background:
+      radial-gradient(1400px 800px at 80% -200px, #e8f8ff 0%, transparent 60%),
+      radial-gradient(1200px 600px at 20% -180px, #fff2f7 0%, transparent 60%),
+      var(--bg);
+    display:grid;
+    place-items:center;
+    padding: 28px;
+  }
+
+  .wrap{
+    width:min(860px, 100%);
+    display:grid;
+    gap:28px;
+    justify-items:center;
+  }
+
+  .title{
+    text-align:center;
+    letter-spacing:.3px;
+    font-weight:600;
+  }
+
+  .stage{
+    width:min(680px, 100%);
+    aspect-ratio: 16 / 9;
+    position:relative;
+    perspective: 1400px;
+    display:grid;
+    place-items:center;
+    isolation:isolate;
+  }
+
+  /* Envelope */
+  .envelope{
+    --w: min(520px, 86%);
+    width: var(--w);
+    height: calc(var(--w) * .62);
+    border:0;
+    background:transparent;
+    padding:0;
+    cursor:pointer;
+    position:relative;
+    filter: drop-shadow(0 16px 28px var(--envelope-shadow));
+    transform-style: preserve-3d;
+  }
+
+  .env-body{
+    position:absolute; inset:0;
+    background: linear-gradient(180deg, #fff, #f7f8fb);
+    border-radius: var(--radius);
+    overflow:hidden;
+  }
+  /* Front triangles */
+  .env-front-top, .env-front-left, .env-front-right, .env-front-bottom{
+    position:absolute; inset:0;
+    background: var(--envelope);
+  }
+  .env-front-top    { clip-path: polygon(50% 0%, 100% 60%, 0% 60%); }
+  .env-front-left   { clip-path: polygon(0% 0%, 50% 50%, 0% 100%); }
+  .env-front-right  { clip-path: polygon(100% 0%, 100% 100%, 50% 50%); }
+  .env-front-bottom { clip-path: polygon(0% 100%, 100% 100%, 50% 50%); }
+
+  /* Top flap that opens */
+  .env-flap{
+    position:absolute; inset:0;
+    transform-origin: top center;
+    transform: rotateX(0deg);
+    transition: transform var(--dur-med) var(--ease);
+  }
+  .env-flap::before{
+    content:"";
+    position:absolute; inset:0;
+    background: linear-gradient(180deg, #fff, #f1f4f8);
+    clip-path: polygon(50% 0%, 100% 60%, 0% 60%);
+    border-top-left-radius: var(--radius);
+    border-top-right-radius: var(--radius);
+  }
+
+  /* Tiny wax seal */
+  .seal{
+    position:absolute;
+    left:50%; top:60%;
+    translate:-50% -50%;
+    width:42px; aspect-ratio:1;
+    background: radial-gradient(circle at 30% 30%, #fff 0 22%, transparent 23%), var(--accent);
+    border-radius:50%;
+    box-shadow: 0 3px 10px rgba(0,0,0,.15), inset 0 2px 0 rgba(255,255,255,.45);
+    z-index:3;
+  }
+
+  /* Card container */
+  .card-area{
+    position:absolute; inset:0;
+    display:grid; place-items:center;
+    pointer-events:none;
+  }
+
+  .diamond{
+    --size: min(360px, 60vmin);
+    width: var(--size); height: var(--size);
+    transform: rotate(45deg) translateY(10%);
+    transform-origin: center;
+    transition: transform var(--dur-med) var(--ease), opacity var(--dur-fast) var(--ease);
+    opacity:0;
+    filter: drop-shadow(0 18px 26px var(--card-shadow));
+    position:relative;
+    pointer-events:auto;
+  }
+
+  /* The folded flaps (top/right/bottom/left) */
+  .panel{
+    position:absolute; inset:0;
+    background: var(--card);
+    border: 1px solid #e8eef6;
+    transition: transform var(--dur-med) var(--ease), filter var(--dur-fast) var(--ease);
+    transform-style:preserve-3d;
+    backface-visibility:hidden;
+  }
+  .panel.top    { clip-path: polygon(50% 0%, 100% 50%, 0% 50%); transform-origin: 50% 10%; }
+  .panel.right  { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); transform-origin: 90% 50%; }
+  .panel.bottom { clip-path: polygon(0% 50%, 100% 50%, 50% 100%); transform-origin: 50% 90%; }
+  .panel.left   { clip-path: polygon(50% 0%, 50% 100%, 0% 50%);  transform-origin: 10% 50%; }
+
+  /* Inner square with content (initially hidden by flaps) */
+  .inner{
+    position:absolute; inset:16%;
+    display:grid; place-items:center;
+    padding:18px;
+    text-align:center;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #e6edf5;
+    box-shadow: 0 1px 0 #fff inset, 0 12px 40px rgba(0,0,0,.06);
+    opacity:0;
+    transition: opacity var(--dur-fast) var(--ease) .1s;
+  }
+  .inner h2{
+    margin:.2rem 0 1rem; font-size: clamp(1.3rem, 2.4vw, 1.8rem);
+    color: var(--card-ink);
+  }
+  .inner p{ margin:.25rem 0; color: #2a3a4a; }
+  .inner .meta{ opacity:.8; font-size:.95rem; }
+  .cta{
+    margin-top:1rem;
+    display:inline-block;
+    padding:.6rem 1rem;
+    border-radius:12px;
+    border:1px solid #d6e6f2;
+    background: linear-gradient(180deg, #fff, #f4f9ff);
+    color: var(--accent-dark);
+    text-decoration:none;
+    font-weight:600;
+  }
+
+  /* States */
+  .envelope[aria-expanded="true"] .env-flap{
+    transform: rotateX(-168deg);
+  }
+  .envelope[aria-expanded="true"] ~ .card-area .diamond{
+    opacity:1;
+    transform: rotate(45deg) translateY(-22%);
+  }
+
+  /* Unfolded card */
+  .diamond[aria-expanded="true"] .panel.top{    transform: rotateX(-180deg); }
+  .diamond[aria-expanded="true"] .panel.bottom{ transform: rotateX(180deg);  }
+  .diamond[aria-expanded="true"] .panel.left{   transform: rotateY(-180deg); }
+  .diamond[aria-expanded="true"] .panel.right{  transform: rotateY(180deg);  }
+  .diamond[aria-expanded="true"] .inner{ opacity:1; }
+
+  /* Hover niceties */
+  .envelope:where(:hover,:focus-visible) .seal{ scale:1.06; }
+  .diamond:where(:hover,:focus-visible){ filter: drop-shadow(0 22px 40px rgba(0,0,0,.18)); }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce){
+    .env-flap, .diamond, .panel, .inner{ transition: none !important; }
+  }
+
+  /* Helper hint */
+  .hint{
+    font-size:.95rem; opacity:.7; text-align:center;
+  }
+
+  /* Small screens */
+  @media (max-width:520px){
+    .hint{ font-size:.9rem; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="title">
+      <h1>Du bist eingeladen!</h1>
+      <p class="hint">Tippe erst auf das Kuvert, dann auf die Diamant-Karte zum Aufklappen.</p>
+    </div>
+
+    <div class="stage" role="region" aria-label="Interaktive Einladungskarte">
+      <!-- Envelope Button -->
+      <button class="envelope" id="envelope"
+              aria-expanded="false"
+              aria-controls="karte"
+              title="Kuvert öffnen (Leertaste/Enter)">
+        <div class="env-body">
+          <div class="env-front-top"></div>
+          <div class="env-front-left"></div>
+          <div class="env-front-right"></div>
+          <div class="env-front-bottom"></div>
+          <div class="env-flap"></div>
+        </div>
+        <div class="seal" aria-hidden="true"></div>
+      </button>
+
+      <!-- Card Area (appears after opening) -->
+      <div class="card-area">
+        <div class="diamond" id="karte" role="button" tabindex="0"
+             aria-expanded="false"
+             aria-label="Karte aufklappen">
+          <!-- Four folding panels -->
+          <div class="panel top"    aria-hidden="true"></div>
+          <div class="panel right"  aria-hidden="true"></div>
+          <div class="panel bottom" aria-hidden="true"></div>
+          <div class="panel left"   aria-hidden="true"></div>
+
+          <!-- Content inside -->
+          <div class="inner">
+            <!-- ======= HIER DEINE TEXTE ANPASSEN ======= -->
+            <p class="meta">Einladung</p>
+            <h2>Diamant-Party von <span style="color:var(--accent-dark)">Alex & Sam</span></h2>
+            <p><strong>Datum:</strong> 12. Oktober 2025, 18:00</p>
+            <p><strong>Ort:</strong> Crystal Hall, Hauptstraße 12, 1010 Wien</p>
+            <p class="meta">Dresscode: Sparkly ✨</p>
+            <a class="cta" href="#" onclick="alert('Hier könntest du zum Kalender-Event, einer Anfahrt oder RSVP verlinken.');return false;">Zusagen / Infos</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="hint">Tipp: Farben oben bei <code>:root</code> ändern, Texte im <code>.inner</code>-Block anpassen.</p>
+  </div>
+
+<script>
+  (function(){
+    const envelope = document.getElementById('envelope');
+    const card = document.getElementById('karte');
+
+    function toggleEnvelope(){
+      const expanded = envelope.getAttribute('aria-expanded') === 'true';
+      envelope.setAttribute('aria-expanded', String(!expanded));
+      // Ensure the card is keyboard-focusable after opening
+      if(!expanded){ setTimeout(()=> card.focus(), 300); }
+    }
+
+    function toggleCard(){
+      const expanded = card.getAttribute('aria-expanded') === 'true';
+      card.setAttribute('aria-expanded', String(!expanded));
+    }
+
+    // Click / key handlers
+    envelope.addEventListener('click', toggleEnvelope);
+    envelope.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggleEnvelope(); }
+    });
+
+    card.addEventListener('click', toggleCard);
+    card.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggleCard(); }
+    });
+
+    // Optional: auto-open the envelope after a short delay
+    // setTimeout(()=> envelope.click(), 600);
+  })();
+</script>
+</body>
+</html>
