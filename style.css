@@ -1,0 +1,76 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  background: #ececec;
+  font-family: sans-serif;
+}
+
+/* Kuvert mit Papiertextur */
+.envelope {
+  position: relative;
+  width: 400px;
+  height: 280px;
+  background: url("envelope.jpg") center/cover no-repeat;
+  border: 2px solid #ccc;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  overflow: hidden;
+  perspective: 1000px;
+}
+
+/* Siegel */
+.seal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  text-align: center;
+}
+
+.seal img {
+  width: 120px;
+  height: auto;
+}
+
+.seal-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 32px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 0 5px rgba(0,0,0,0.6);
+}
+
+/* Diamant-Karte */
+.diamond {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.5);
+  opacity: 0;
+  transition: all 1s ease;
+  text-align: center;
+}
+
+.diamond img {
+  width: 200px;
+  height: auto;
+  cursor: pointer;
+}
+
+.card-content {
+  margin-top: 20px;
+  background: rgba(255,255,255,0.95);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+
+.hidden {
+  display: none;
+}
