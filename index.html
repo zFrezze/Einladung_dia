@@ -11,48 +11,49 @@
        font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto;color:var(--ink);overflow:hidden;padding:18px}
   .hint{opacity:.75;font-size:.92rem;margin-bottom:10px;text-align:center}
 
-  /* ===== Envelope (one image) ===== */
-  .env-frame{position:relative;width:min(640px,94vw);aspect-ratio:4/3;perspective:1600px;isolation:isolate}
-  .env-body{
-    position:absolute;inset:0;border-radius:14px;overflow:hidden;z-index:1;
-    background:url("envelope.jpg") center/cover no-repeat; box-shadow:var(--shadow);
-  }
-  /* top flap overlays same image; clip triangle; rotates up */
-  .flap-top{
-    position:absolute;inset:0;z-index:3;transform-style:preserve-3d;backface-visibility:hidden;
-    background:url("envelope.jpg") center/cover no-repeat; border-top-left-radius:14px; border-top-right-radius:14px;
-    clip-path:polygon(0 0,100% 0,50% 57%); /* passt die Spitze ggf. an dein Bild an */
-    transform-origin:50% 0%; /* top edge */ transform:rotateX(0deg);
-  }
-  /* dezente Schattenkante unter Flap */
-  .flap-shadow{ position:absolute; left:8%; right:8%; top:52%; height:16px; z-index:2;
-    background:radial-gradient(50% 100% at 50% 0%, rgba(0,0,0,.18), transparent 70%); filter:blur(2px); opacity:.55; pointer-events:none; }
+/* ===== Envelope (one image) ===== */
+.env-frame{position:relative;width:min(640px,94vw);aspect-ratio:4/3;perspective:1600px;isolation:isolate}
+.env-body{
+  position:absolute;inset:0;border-radius:14px;overflow:hidden;z-index:1;
+  background:url("envelope.jpg") center/cover no-repeat; box-shadow:0 24px 70px rgba(10,20,40,.18);
+}
 
-  /* ===== Seal (intakt + Canvas-Fragmente) ===== */
-  .seal-wrap{position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);
-             width:130px;height:130px;z-index:6}
-  .seal-intact{position:absolute;inset:0;display:grid;place-items:center}
-  .seal-intact img{width:100%;height:auto;display:block}
-  .seal-hh{position:absolute;inset:0;display:grid;place-items:center;font:700 30px/1 Georgia,serif;
-           color:rgba(255,255,255,.96);text-shadow:0 2px 6px rgba(0,0,0,.35);pointer-events:none}
-  canvas.seal-frag{position:absolute;inset:0;width:100%;height:100%;opacity:0;pointer-events:none}
+/* Innenfütterung (sichtbar wenn offen) */
+.env-liner{
+  position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;
+  background:linear-gradient(180deg,#fff,#f4f6f9); /* Innenseite */
+}
 
-  /* ===== Diamond card ===== */
-  .diamond-wrap{position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);
-                width:min(420px,75vmin);height:min(420px,75vmin);z-index:5;pointer-events:none}
-  .diamond{position:absolute;inset:0;transform:rotate(45deg) scale(.2);opacity:0;
-           filter:drop-shadow(0 30px 70px rgba(0,0,0,.25));pointer-events:auto;cursor:pointer}
-  .piece{position:absolute;width:50%;height:50%;background:url("diamond.jpg") center/cover no-repeat;
-         border:1px solid rgba(0,0,0,.08);backface-visibility:hidden;transform-style:preserve-3d}
-  .top{left:25%;top:0;transform-origin:50% 100%}
-  .right{right:0;top:25%;transform-origin:0% 50%}
-  .bottom{left:25%;bottom:0;transform-origin:50% 0%}
-  .left{left:0;top:25%;transform-origin:100% 50%}
-  .inner{position:absolute;left:18%;top:18%;width:64%;height:64%;transform:rotate(-45deg);
-         background:#fff;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.15);
-         display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;text-align:center;opacity:0}
-  .inner h2{margin:.2rem 0 .6rem;font-size:clamp(1.1rem,2.4vw,1.5rem)}
-  .inner p{margin:.2rem 0;color:#2a3a4a;font-size:.98rem}
+/* Patch deckt die gedruckte Klappe im Body ab (Dreieck) */
+.env-patch{
+  position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;
+  background:#f7f9fc; /* leicht heller als Body */
+  clip-path:polygon(0 0,100% 0,50% 57%);
+}
+
+/* Top-Klappe klappt nach oben und BLEIBT sichtbar */
+.flap-top{
+  position:absolute;inset:0;z-index:3;transform-style:preserve-3d;
+  background:url("envelope.jpg") center/cover no-repeat;
+  border-top-left-radius:14px;border-top-right-radius:14px;
+  clip-path:polygon(0 0,100% 0,50% 57%);
+  transform-origin:50% 0%;
+  backface-visibility:visible;   /* wichtig: nicht verschwinden */
+  transform:rotateX(0deg);
+}
+/* Rückseite der Klappe (Papier) */
+.flap-top::after{
+  content:""; position:absolute; inset:0; border-top-left-radius:14px;border-top-right-radius:14px;
+  clip-path:inherit; background:linear-gradient(180deg,#ffffff,#eef2f7);
+  transform:rotateY(180deg); /* zeigt sich, wenn die Vorderseite „hinten“ ist */
+}
+
+/* Schatten unter der Klappenkante */
+.flap-shadow{ position:absolute; left:8%; right:8%; top:52%; height:16px; z-index:2;
+  background:radial-gradient(50% 100% at 50% 0%, rgba(0,0,0,.18), transparent 70%);
+  filter:blur(2px); opacity:.55; pointer-events:none;
+}
+
 
   @media (max-width:540px){
     .seal-wrap{width:100px;height:100px}
