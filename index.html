@@ -14,9 +14,12 @@
 /* ===== Envelope (one image) ===== */
 .env-frame{position:relative;width:min(640px,94vw);aspect-ratio:4/3;perspective:1600px;isolation:isolate}
 .env-body{
+.env-body{
   position:absolute;inset:0;border-radius:14px;overflow:hidden;z-index:1;
-  background:url("envelope.jpg") center/cover no-repeat; box-shadow:0 24px 70px rgba(10,20,40,.18);
+  background:linear-gradient(180deg,#fff,#f2f4f8); /* neutraler Papier-Look */
+  box-shadow:0 24px 70px rgba(10,20,40,.18);
 }
+
 
 /* Innenfütterung (sichtbar wenn offen) */
 .env-liner{
@@ -64,37 +67,29 @@
   <div>
     <p class="hint">Klick 1: Siegel zersplittert · Klick 2: Klappe klappt nach oben & bleibt offen · Klick auf Diamant: Karte klappt auf</p>
 
-    <div class="env-frame" id="frame" role="region" aria-label="Einladung">
-      <<div class="env-body"></div>
-      <div class="env-liner" id="envLiner"></div>
-      <div class="env-patch" id="envPatch"></div>
-      <div class="flap-top" id="flapTop" aria-hidden="true"></div>
-      <div class="flap-shadow" id="flapShadow" aria-hidden="true"></div>
+<div class="env-frame" id="frame">
+  <!-- Umschlag-Körper -->
+  <div class="env-body"></div>
+  <!-- Innenfutter & Patch (zuerst unsichtbar) -->
+  <div class="env-liner" id="envLiner"></div>
+  <div class="env-patch" id="envPatch"></div>
+  <!-- Klappe oben -->
+  <div class="flap-top" id="flapTop"></div>
+  <div class="flap-shadow" id="flapShadow"></div>
 
-
-      <!-- Seal (intakt + Fragmente) -->
-      <div class="seal-wrap" id="sealWrap">
-        <div class="seal-intact" id="sealIntact">
-          <img src="seal.png" alt="Wachssiegel"><div class="seal-hh" id="sealHH">HH</div>
-        </div>
-        <!-- Canvas-Fragmente werden per JS erstellt -->
-      </div>
-
-      <!-- Diamond card -->
-      <div class="diamond-wrap" id="diamondWrap" aria-hidden="true">
-        <div class="diamond" id="diamond" tabindex="0" role="button" aria-label="Diamantkarte">
-          <div class="piece top"></div><div class="piece right"></div>
-          <div class="piece bottom"></div><div class="piece left"></div>
-          <div class="inner" id="inner">
-            <h2>Einladung</h2>
-            <p><strong>Wann:</strong> 12. Oktober 2025 · 18:00</p>
-            <p><strong>Wo:</strong> Crystal Hall, Hauptstraße 12</p>
-            <p>Wir freuen uns auf dich! ✨</p>
-          </div>
-        </div>
-      </div>
+  <!-- Siegel -->
+  <div class="seal-wrap" id="sealWrap">
+    <div class="seal-intact" id="sealIntact">
+      <img src="seal.png" alt="Siegel">
+      <div class="seal-hh">HH</div>
     </div>
   </div>
+
+  <!-- Diamant-Karte -->
+  <div class="diamond-wrap" id="diamondWrap">
+    ...
+  </div>
+</div>
 
   <!-- GSAP -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
