@@ -1,25 +1,24 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Einladung</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <div class="envelope">
-    <div class="seal">
-      <img src="seal.png" alt="Wachssiegel" id="seal">
-      <span class="seal-text">HH</span>
-    </div>
-    <div class="diamond hidden">
-      <img src="diamond.svg" alt="Diamantkarte">
-      <div class="card-content hidden">
+<div class="envelope">
+  <!-- Siegel mit vier Splittern -->
+  <div class="seal" id="sealWrapper">
+    <div class="seal-piece piece1"></div>
+    <div class="seal-piece piece2"></div>
+    <div class="seal-piece piece3"></div>
+    <div class="seal-piece piece4"></div>
+    <span class="seal-text">HH</span>
+  </div>
+
+  <!-- Umschlag-Inhalt -->
+  <div class="flap" id="flap"></div>
+
+  <!-- Karte -->
+  <div class="diamond hidden" id="diamond">
+    <div class="card-fold">
+      <div class="card-front">💎</div>
+      <div class="card-back">
         <h1>Einladung</h1>
-        <p>Hier stehen deine Informationen zur Feier ✨</p>
+        <p>Hier stehen deine Infos 🎉</p>
       </div>
     </div>
   </div>
-  <script src="script.js"></script>
-</body>
-</html>
+</div>
