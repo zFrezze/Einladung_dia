@@ -164,16 +164,20 @@
     }
 
     function openEnvelope(){
-      // Top flap klappt nach oben und bleibt offen
-      gsap.to(flapTop,{duration:1.0, rotationX:-170, ease:"power3.out"});
-      // Schatten wandert/nimmt ab
-      gsap.to(flapShadow,{duration:1.0, opacity:.15, y:-30, ease:"power3.out"});
+  // Klappe realistisch nach oben, sichtbar bleiben
+  gsap.to(flapTop,   {duration:1.0, rotationX:-120, ease:"power3.out"}); // -120° statt -170°
+  gsap.to(flapShadow,{duration:1.0, opacity:.15, y:-30, ease:"power3.out"});
 
-      // Diamant erscheint zentriert (mit Rand)
-      diamondWrap.removeAttribute('aria-hidden');
-      gsap.to('.diamond',{duration:1.05, opacity:1, scale:1, rotation:45, ease:"back.out(1.25)"});
-      state=2;
-    }
+  // Innenfütterung + Patch einblenden (Body „geupdated“)
+  gsap.to('#envLiner', {duration:0.5, opacity:1, delay:0.25, ease:"power1.out"});
+  gsap.to('#envPatch', {duration:0.5, opacity:1, delay:0.25, ease:"power1.out"});
+
+  // Diamant erscheint zentriert (mit Rand)
+  diamondWrap.removeAttribute('aria-hidden');
+  gsap.to('.diamond',{duration:1.05, opacity:1, scale:1, rotation:45, ease:"back.out(1.25)"});
+
+  state = 2;
+}
 
     function openDiamond(){
       if(diamondOpen) return; diamondOpen = true;
