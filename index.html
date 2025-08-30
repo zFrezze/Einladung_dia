@@ -65,26 +65,39 @@
     const cardWrap=document.getElementById('cardWrap');
     const cardImg=document.getElementById('cardImg');
 
+    // === Siegel brechen ===
     function breakSealSlow(){
-      gsap.to(sealIntact,{duration:.2,scale:1.1,yoyo:true,repeat:1,onComplete:()=>sealIntact.style.display="none"});
+      gsap.to(sealIntact,{
+        duration:.2,scale:1.1,yoyo:true,repeat:1,
+        onComplete:()=>sealIntact.style.display="none"
+      });
       state=1;
     }
 
+    // === Umschlag öffnen + Karte hinausfliegen ===
     function openEnvelopeAndCardTwoStage(){
+      // Umschlagklappe
       gsap.to(flapTop,{duration:2,rotationX:-120,ease:"power2.inOut"});
       gsap.to(flapShadow,{duration:2,opacity:.2,y:-24,ease:"power2.inOut"});
 
+      // Timeline für Karte
       const tl=gsap.timeline({delay:.95,defaults:{ease:"power2.inOut"}});
-      // rausfliegen wie vorher
+      // 1) Karte durch Öffnung raus
       tl.to(cardImg,{duration:1.7,y:"-=90%",scale:.25,rotation:-8,opacity:1});
+      // 2) Clip entfernen, Karte vor den Umschlag holen
       tl.add(()=>{document.querySelector('.card-wrap').style.clipPath='none'; gsap.set(cardWrap,{zIndex:7});});
-      tl.to(cardImg,{duration:1.6,y:"-50%",scale:1,rotation:0,onComplete:()=>{
-        // automatischer Flip
-        gsap.to(cardImg,{duration:1,rotateY:180,ease:"power2.inOut",delay:1.5});
-      }});
+      // 3) In Mitte fliegen und größer werden
+      tl.to(cardImg,{
+        duration:1.6,y:"-50%",scale:1,rotation:0,
+        onComplete:()=>{
+          // === Automatischer Flip nach 1.5 Sekunden ===
+          gsap.to(cardImg,{duration:1,rotateY:180,ease:"power2.inOut",delay:1.5});
+        }
+      });
       state=2;
     }
 
+    // Klicksteuerung
     document.getElementById('frame').addEventListener('click',()=>{
       if(state===0) breakSealSlow();
       else if(state===1) openEnvelopeAndCardTwoStage();
