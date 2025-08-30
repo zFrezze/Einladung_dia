@@ -47,30 +47,21 @@
     width:min(460px,76vmin);height:min(460px,76vmin);
     z-index:3;clip-path:polygon(0 0,100% 0,50% 57%);
   }
-  .card-container {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    transform-style: preserve-3d;
-    transition: transform 1.5s;
-  }
-  .card-front, .card-back {
-    position: absolute;
-    width: 100%;
-    height: 100%;
+  .card-img{
+    position:absolute;left:50%;top:50%;
+    transform:translate(-50%,-50%) translateY(60%) scale(.48);
+    width:100%;height:auto;opacity:.95;
+    filter: drop-shadow(0 30px 70px rgba(0,0,0,.25));
+    cursor:pointer;user-select:none;
     backface-visibility: hidden;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 30px 70px rgba(0,0,0,.25);
   }
   .card-back {
-    transform: rotateY(180deg);
-  }
-  .card-img{
-    width:100%;
-    height:100%;
-    object-fit: cover;
-    display: block;
+    position:absolute;left:50%;top:50%;
+    transform:translate(-50%,-50%) translateY(60%) scale(.48) rotateY(180deg);
+    width:100%;height:auto;opacity:0;
+    filter: drop-shadow(0 30px 70px rgba(0,0,0,.25));
+    cursor:pointer;user-select:none;
+    backface-visibility: hidden;
   }
 </style>
 </head>
@@ -91,14 +82,8 @@
 
     <!-- Karte -->
     <div class="card-wrap" id="cardWrap" aria-hidden="true">
-      <div class="card-container" id="cardContainer">
-        <div class="card-front">
-          <img src="diamond.jpg" alt="Vorderseite der Einladungskarte" class="card-img">
-        </div>
-        <div class="card-back">
-          <img src="diamond_2.png" alt="Rückseite der Einladungskarte" class="card-img">
-        </div>
-      </div>
+      <img src="diamond.jpg" alt="Einladungskarte" id="cardImg" class="card-img">
+      <img src="diamond_2.png" alt="Rückseite der Einladungskarte" id="cardBack" class="card-back">
     </div>
   </div>
 
@@ -111,7 +96,8 @@
     const envPatch=document.getElementById('envPatch');
     const sealIntact=document.getElementById('sealIntact');
     const cardWrap=document.getElementById('cardWrap');
-    const cardContainer=document.getElementById('cardContainer');
+    const cardImg=document.getElementById('cardImg');
+    const cardBack=document.getElementById('cardBack');
 
     function breakSeal(){
       gsap.to(sealIntact,{
@@ -128,15 +114,18 @@
       gsap.to(envPatch,  {duration:.9, opacity:1, delay:.5});
 
       const tl=gsap.timeline({delay:0.95,defaults:{ease:"power2.inOut"}});
-      tl.to(cardContainer,{duration:1.7,y:"-=90%",scale:.25,rotation:-8,opacity:1});
+      tl.to([cardImg, cardBack],{duration:1.7,y:"-=90%",scale:.25,rotation:-8,opacity:1});
       tl.add(()=>{document.querySelector('.card-wrap').style.clipPath='none'; gsap.set(cardWrap,{zIndex:7});});
-      tl.to(cardContainer,{duration:1.6,y:"-50%",scale:1.0,rotation:0});
+      tl.to([cardImg, cardBack],{duration:1.6,y:"-50%",scale:1.0,rotation:0});
+      
       // Nach 1.5 Sekunden die Karte umdrehen
-      tl.to(cardContainer, {duration: 0.01, onComplete: () => {
+      tl.add(() => {
         setTimeout(() => {
-          cardContainer.style.transform = "rotateY(180deg)";
+          gsap.to(cardImg, {duration: 1.0, rotationY: 180, opacity: 0});
+          gsap.to(cardBack, {duration: 1.0, rotationY: 0, opacity: 1, delay: 0.1});
         }, 1500);
-      }});
+      });
+      
       state=2;
     }
 
