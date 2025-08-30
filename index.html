@@ -87,17 +87,26 @@
   .seal-hh{position:absolute;inset:0;display:grid;place-items:center;font:700 30px/1 Georgia,serif;color:rgba(255,255,255,.96);text-shadow:0 2px 6px rgba(0,0,0,.35);pointer-events:none}
   canvas.seal-frag{position:absolute;inset:0;width:100%;height:100%;opacity:1;pointer-events:none;display:none}
 
-  /* ===== Karte (ein einzelnes Bild in Diamantform) ===== */
-  .card-wrap{
-    position:absolute;left:50%;top:74%;transform:translate(-50%,-50%); /* Start: ganz unten, hinter Body */
-    width:min(460px,76vmin);height:auto;z-index:0;pointer-events:none;overflow:visible;
-  }
-  .card-img{
-    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) translateY(28%) rotate(0deg) scale(.35);
-    width:100%;height:auto;opacity:0;filter: drop-shadow(0 30px 70px rgba(0,0,0,.25));
-    pointer-events:auto;cursor:pointer; /* falls du später Klick brauchst */
-    user-select:none;
-  }
+/* ===== Karte (ein Bild, erst durch Dreiecks-Öffnung sichtbar) ===== */
+.card-wrap{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(460px,76vmin);height:min(460px,76vmin);
+  z-index:3;                      /* über Body/Patch, unter Flap */
+  pointer-events:none;overflow:visible;
+
+  /* Clip genau wie die Lasche/der Patch – nur dort wird die Karte anfangs sichtbar */
+  clip-path:polygon(0 0,100% 0,50% 57%);
+}
+
+.card-img{
+  position:absolute;left:50%;top:50%;
+  /* Start: knapp UNTER der Öffnung, damit sie früher erscheint */
+  transform:translate(-50%,-50%) translateY(60%) scale(.48);
+  width:100%;height:auto;opacity:0.95;
+  filter: drop-shadow(0 30px 70px rgba(0,0,0,.25));
+  pointer-events:auto;cursor:pointer;user-select:none;
+}
+
 </style>
 </head>
 <body>
@@ -206,48 +215,48 @@
       state = 1;
     }
 
-    function openEnvelopeAndCardTwoStage(){
-      // Klappe langsam öffnen
-      gsap.to(flapTop,{duration:2.0, rotationX:-120, ease: "power2.inOut"});
-      gsap.to(flapShadow,{duration:2.0, opacity:.20, y:-24, ease:"power2.inOut"});
-      gsap.to(envLiner ,{duration:.9,  opacity:1, delay:.5, ease:"power1.out"});
-      gsap.to(envPatch ,{duration:.9,  opacity:1, delay:.5, ease:"power1.out"});
+function openEnvelopeAndCardTwoStage(){
+  // Klappe langsam öffnen + Innenleben sichtbar
+  gsap.to(flapTop,{duration:2.0, rotationX:-120, ease:"power2.inOut"});
+  gsap.to(flapShadow,{duration:2.0, opacity:.20, y:-24, ease:"power2.inOut"});
+  gsap.to(envLiner ,{duration:.9,  opacity:1, delay:.5, ease:"power1.out"});
+  gsap.to(envPatch ,{duration:.9,  opacity:1, delay:.5, ease:"power1.out"});
 
-      // Karte: Phase 1 – hinter dem Umschlag vom unteren Rand langsam nach oben, leicht größer, teils verdeckt
-      cardWrap.removeAttribute('aria-hidden');
-      // bleibt hinter Body/Patch (zIndex 0) -> nur das sichtbar, was nicht verdeckt ist
-      gsap.to(cardImg, {
-        duration:1.9,
-        y: "-=54%",      // vom unteren Rand hoch
-        scale: 0.55,     // leicht größer
-        opacity: 0.95,
-        ease: "power2.inOut",
-        delay: 1.0
-      });
+  // PHASE 1 — Karte bewegt sich hinter der Klappe hoch,
+  // wird NUR im Dreieck der geöffneten Lasche sichtbar (wegen clip-path auf .card-wrap)
+  gsap.to(cardImg, {
+    duration:1.7,
+    y: "-=20%",        // durch die Öffnung auftauchen
+    scale: 0.58,       // leicht größer
+    ease: "power2.inOut",
+    delay: 0.9
+  });
 
-      // Karte: Phase 2 – genau im „Laschenbereich“ auftauchen (vor den Body/ Patch, aber unter der Klappe), dann noch ein Stück hoch
-      gsap.delayedCall(2.8, ()=>{
-        gsap.set(cardWrap, {zIndex:3}); // über Patch (2) & Body (2), unter Flap (4)
-        gsap.to(cardImg, {
-          duration:0.7,
-          y: "-=10%",     // kleines Stück weiter ins Sichtfeld
-          ease: "power2.inOut"
-        });
-      });
+  // PHASE 2 — noch ein Stück weiter hoch, immer noch geclippt
+  gsap.to(cardImg, {
+    duration:0.8,
+    y: "-=12%",
+    ease: "power2.inOut",
+    delay: 2.6
+  });
 
-      // Karte: Phase 3 – in die Mitte, größer werden, ganz nach vorn
-      gsap.delayedCall(3.6, ()=>{
-        gsap.set(cardWrap, {zIndex:7}); // jetzt vor dem Umschlag
-        gsap.to(cardImg, {
-          duration:1.05,
-          y: "0%",
-          scale: 1.0,
-          ease: "power2.inOut"
-        });
-      });
+  // PHASE 3 — Clip entfernen, Karte nach vorn holen und zentrieren + groß
+  gsap.delayedCall(3.5, ()=>{
+    // Clip abschalten und vor den Umschlag legen
+    document.querySelector('.card-wrap').style.clipPath = 'none';
+    gsap.set(cardWrap, {zIndex:7}); // vor dem Umschlag
 
-      state = 2;
-    }
+    gsap.to(cardImg, {
+      duration:1.1,
+      y: "0%",
+      scale: 1.0,
+      ease: "power2.inOut"
+    });
+  });
+
+  state = 2;
+}
+
 
     /* ---- Interaction ---- */
     frame.addEventListener('click', ()=>{
