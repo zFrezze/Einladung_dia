@@ -35,7 +35,10 @@
   /* Siegel */
   .seal-wrap{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);
     width:140px;height:140px;z-index:6;display:flex;justify-content:center;align-items:center}
-  .seal-intact img{width:100%;height:auto;cursor:pointer;user-select:none}
+  .seal-intact{position:relative;width:100%;height:100%;}
+  .seal-intact img{width:100%;height:auto;cursor:pointer;user-select:none;position:absolute;inset:0}
+  .seal-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-weight:bold;font-size:40px;color:white;pointer-events:none;}
 
   /* Karte */
   .card-wrap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
@@ -58,6 +61,7 @@
     <div class="seal-wrap" id="sealWrap">
       <div class="seal-intact" id="sealIntact">
         <img src="seal.png" alt="Siegel">
+        <div class="seal-text">HH</div>
       </div>
     </div>
 
@@ -80,13 +84,29 @@
     const cardBack=document.getElementById('cardBack');
 
     function breakSeal(){
+      const pieceStyles=[
+        "clip-path:polygon(0 0,50% 0,50% 50%,0 50%);",
+        "clip-path:polygon(50% 0,100% 0,100% 50%,50% 50%);",
+        "clip-path:polygon(0 50%,50% 50%,50% 100%,0 100%);",
+        "clip-path:polygon(50% 50%,100% 50%,100% 100%,50% 100%);"
+      ];
       const pieces=[];
-      for(let i=0;i<6;i++){
+      for(let i=0;i<4;i++){
         const p=document.createElement('div');
-        p.style.cssText="position:absolute;width:40px;height:40px;border-radius:50%;background:#a83232;left:50%;top:50%;";
-        sealIntact.appendChild(p);pieces.push(p);
+        p.style.cssText="position:absolute;inset:0;background:url('seal.png') center/contain no-repeat;"+pieceStyles[i];
+        sealIntact.appendChild(p);
+        pieces.push(p);
       }
-      gsap.to(pieces,{duration:1.2,x:()=>Math.random()*200-100,y:()=>Math.random()*200-100,rotation:()=>Math.random()*180-90,opacity:0,stagger:0.05,ease:"power3.out",onComplete:()=>{sealIntact.style.display="none"}});
+      gsap.to(pieces,{
+        duration:1.4,
+        x:(i)=>[ -120,120,-80,80 ][i],
+        y:(i)=>[ -80,-80,80,80 ][i],
+        rotation:()=>Math.random()*160-80,
+        opacity:0,
+        ease:"power3.out",
+        stagger:0.1,
+        onComplete:()=>{sealIntact.style.display="none"}
+      });
       state=1;
     }
 
@@ -101,7 +121,7 @@
       tl.add(()=>{document.querySelector('.card-wrap').style.clipPath='none'});
       tl.to([cardFront,cardBack],{duration:1.6,y:"-50%",scale:1,rotation:0});
       
-      // automatisches Umdrehen nach 1.5s
+      // automatischer Flip nach 1.5s
       tl.add(()=>{setTimeout(()=>{
         gsap.to(cardFront,{duration:1,rotationY:180,opacity:0});
         gsap.to(cardBack,{duration:1,rotationY:0,opacity:1,delay:.1});
