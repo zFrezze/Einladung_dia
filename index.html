@@ -230,29 +230,30 @@ function openEnvelopeAndCardTwoStage(){
   // Timeline für Karte
   const tl = gsap.timeline({ delay: 0.95, defaults:{ ease:"power2.inOut" } });
 
-  // 1) Auf EINMAL durch die Öffnung (geclippt, kleiner, schnell)
+  // 1) Durch die Öffnung fliegen – jetzt langsamer
   tl.to(cardImg, {
-    duration: 0.7,
+    duration: 1.5,   // vorher 0.7 → jetzt deutlich langsamer
     y: "-=60%",      // kräftig hoch durchs Dreieck
     scale: 0.50,
     opacity: 1
   });
 
-  // 2) Clip weg, vor den Umschlag holen
+  // 2) Clip weg, Karte vor den Umschlag holen
   tl.add(() => {
     document.querySelector('.card-wrap').style.clipPath = 'none';
     gsap.set(cardWrap, { zIndex: 7 });
   });
 
-  // 3) In die Mitte fliegen und währenddessen vergrößern
+  // 3) In die Mitte & größer – etwas höher enden
   tl.to(cardImg, {
-    duration: 1.15,
-    y: "0%",         // exakt zentriert (Wrap liegt bei top:50%)
-    scale: 1.00
+    duration: 1.6,   // länger fürs „Genießen“
+    y: "-8%",        // höher als 0%, zentriert etwas weiter oben
+    scale: 1.0
   });
 
   state = 2;
 }
+
 
 
 
