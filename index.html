@@ -20,7 +20,7 @@
     overflow:hidden;padding:18px
   }
 
-  /* ===== Umschlag (gebaut, mit mehr Kontrast) ===== */
+  /* ===== Umschlag (gebaut, mit Kontrast) ===== */
   .env-frame{position:relative;width:min(700px,94vw);aspect-ratio:4/3;perspective:1800px;isolation:isolate;overflow:visible}
   .env-body{
     position:absolute;inset:0;border-radius:18px;overflow:hidden;z-index:2;
@@ -48,8 +48,9 @@
     position:absolute;inset:0;border-radius:18px;z-index:1;opacity:0;pointer-events:none;
     background:linear-gradient(180deg,var(--liner-hi),var(--liner-lo));
   }
+  /* Patch deckt die gedachte Klappe im Body ab (macht offenen Look) */
   .env-patch{
-    position:absolute;inset:0;border-radius:18px;z-index:3;opacity:0;pointer-events:none;
+    position:absolute;inset:0;border-radius:18px;z-index:2;opacity:0;pointer-events:none; /* <— unter der Klappe, über Liner/Body */
     background:var(--liner-hi);
     clip-path:polygon(0 0,100% 0,50% 57%);
     box-shadow:0 1px 0 rgba(0,0,0,.10) inset;
@@ -86,32 +87,16 @@
   .seal-hh{position:absolute;inset:0;display:grid;place-items:center;font:700 30px/1 Georgia,serif;color:rgba(255,255,255,.96);text-shadow:0 2px 6px rgba(0,0,0,.35);pointer-events:none}
   canvas.seal-frag{position:absolute;inset:0;width:100%;height:100%;opacity:1;pointer-events:none;display:none}
 
-  /* ===== Diamant-Karte ===== */
-  .diamond-wrap{
-    position:absolute;left:50%;top:74%;transform:translate(-50%,-50%);
-    width:min(460px,76vmin);height:min(460px,76vmin);
-    z-index:0; /* hinter dem Umschlag */
-    pointer-events:none; overflow:visible;
+  /* ===== Karte (ein einzelnes Bild in Diamantform) ===== */
+  .card-wrap{
+    position:absolute;left:50%;top:74%;transform:translate(-50%,-50%); /* Start: ganz unten, hinter Body */
+    width:min(460px,76vmin);height:auto;z-index:0;pointer-events:none;overflow:visible;
   }
-  .diamond{
-    position:absolute;inset:0;
-    transform:translateY(28%) rotate(45deg) scale(.35); /* unten, klein */
-    transform-origin:center; opacity:0;
-    filter: drop-shadow(0 30px 70px rgba(0,0,0,.25));
-    pointer-events:auto;cursor:pointer;
-  }
-  .piece{position:absolute;width:50%;height:50%;background:url("diamond.jpg") center/cover no-repeat;border:1px solid rgba(0,0,0,.10);backface-visibility:hidden;transform-style:preserve-3d}
-  .top{left:25%;top:0;transform-origin:50% 100%}
-  .right{right:0;top:25%;transform-origin:0% 50%}
-  .bottom{left:25%;bottom:0;transform-origin:50% 0%}
-  .left{left:0;top:25%;transform-origin:100% 50%}
-  .inner{position:absolute;left:18%;top:18%;width:64%;height:64%;transform:rotate(-45deg);background:#fff;border-radius:16px;box-shadow:var(--shadow-soft);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;text-align:center;opacity:0}
-  .inner h2{margin:.2rem 0 .6rem;font-size:clamp(1.1rem,2.4vw,1.6rem)}
-  .inner p{margin:.2rem 0;color:#2a3a4a;font-size:clamp(.95rem,1.6vw,1rem)}
-  .cta{margin-top:.6rem;display:inline-block;padding:.6rem .9rem;border-radius:12px;border:1px solid #dfe7f1;background:linear-gradient(#fff,#f6f9ff);text-decoration:none;color:#0a76cc;font-weight:600}
-
-  @media (max-width:560px){
-    .seal-wrap{width:112px;height:112px}
+  .card-img{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) translateY(28%) rotate(0deg) scale(.35);
+    width:100%;height:auto;opacity:0;filter: drop-shadow(0 30px 70px rgba(0,0,0,.25));
+    pointer-events:auto;cursor:pointer; /* falls du später Klick brauchst */
+    user-select:none;
   }
 </style>
 </head>
@@ -133,28 +118,16 @@
       <!-- Canvas-Fragmente werden per JS erzeugt (initial display:none) -->
     </div>
 
-    <!-- Diamant-Karte -->
-    <div class="diamond-wrap" id="diamondWrap" aria-hidden="true">
-      <div class="diamond" id="diamond" tabindex="0" role="button" aria-label="Diamantkarte">
-        <div class="piece top"></div>
-        <div class="piece right"></div>
-        <div class="piece bottom"></div>
-        <div class="piece left"></div>
-        <div class="inner" id="inner">
-          <h2>Einladung</h2>
-          <p><strong>Wann:</strong> 12. Oktober 2025 · 18:00</p>
-          <p><strong>Wo:</strong> Crystal Hall, Hauptstraße 12</p>
-          <p>Dresscode: Sparkly ✨</p>
-          <a class="cta" href="#" onclick="return false;">Zusagen</a>
-        </div>
-      </div>
+    <!-- Karte (ein Bild) -->
+    <div class="card-wrap" id="cardWrap" aria-hidden="true">
+      <img src="diamond.jpg" alt="Einladungskarte" id="cardImg" class="card-img">
     </div>
   </div>
 
   <!-- GSAP -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script>
-    let state = 0, diamondOpen = false;
+    let state = 0;
 
     const frame = document.getElementById('frame');
     const flapTop = document.getElementById('flapTop');
@@ -164,9 +137,8 @@
     const sealWrap = document.getElementById('sealWrap');
     const sealIntact = document.getElementById('sealIntact');
     const sealHH = document.getElementById('sealHH');
-    const diamondWrap = document.getElementById('diamondWrap');
-    const diamond = document.getElementById('diamond');
-    const inner = document.getElementById('inner');
+    const cardWrap = document.getElementById('cardWrap');
+    const cardImg = document.getElementById('cardImg');
 
     /* ---- Siegel-Fragmente vorbereiten ---- */
     const POLYS = [
@@ -209,7 +181,7 @@
 
     /* ---- Animationen ---- */
     function breakSealSlow(){
-      // etwas langsamer, ohne Fade: klarer "pop" und Stücke bewegen sich
+      // etwas langsamer, ohne Fade
       gsap.to(sealIntact, {
         duration: .18, scale: 1.06, ease: "power2.out",
         yoyo: true, repeat: 1,
@@ -225,10 +197,9 @@
               {x: -0.70, y: 0.70, r:-14},
               {x: -0.95, y:-0.20, r:-18},
             ][i] || {x:(Math.random()-.5)*1.2, y:(Math.random()-.4)*1.0, r:(Math.random()-.5)*36};
-            const dist = 95 + Math.random()*40; // länger & weiter als vorher
+            const dist = 95 + Math.random()*40;
             gsap.to(c, {duration:.55, x:dir.x*dist, y:dir.y*dist, rotation:dir.r, ease:"power2.out"});
           });
-          // nach der Bewegung sofort entfernen (kein Fade)
           setTimeout(()=>{ frags.forEach(c=>c.remove()); }, 560);
         }
       });
@@ -242,24 +213,35 @@
       gsap.to(envLiner ,{duration:.9,  opacity:1, delay:.5, ease:"power1.out"});
       gsap.to(envPatch ,{duration:.9,  opacity:1, delay:.5, ease:"power1.out"});
 
-      // Phase 1: Karte hinter dem Umschlag langsam nach oben, leicht größer, nur teilweise sichtbar
-      gsap.to(diamond, {
-        duration:1.8,
-        y: "-=54%",
-        scale: 0.52,     // von 0.35 -> 0.52
-        opacity: 0.92,
+      // Karte: Phase 1 – hinter dem Umschlag vom unteren Rand langsam nach oben, leicht größer, teils verdeckt
+      cardWrap.removeAttribute('aria-hidden');
+      // bleibt hinter Body/Patch (zIndex 0) -> nur das sichtbar, was nicht verdeckt ist
+      gsap.to(cardImg, {
+        duration:1.9,
+        y: "-=54%",      // vom unteren Rand hoch
+        scale: 0.55,     // leicht größer
+        opacity: 0.95,
         ease: "power2.inOut",
-        delay: 1.0       // startet während Klappe noch öffnet
+        delay: 1.0
       });
 
-      // Phase 2: nach vorne holen, zentrieren und groß
-      gsap.delayedCall(2.9, ()=>{
-        gsap.set(diamondWrap, {zIndex:7}); // jetzt vor dem Umschlag
-        gsap.to(diamond, {
-          duration:1.1,
+      // Karte: Phase 2 – genau im „Laschenbereich“ auftauchen (vor den Body/ Patch, aber unter der Klappe), dann noch ein Stück hoch
+      gsap.delayedCall(2.8, ()=>{
+        gsap.set(cardWrap, {zIndex:3}); // über Patch (2) & Body (2), unter Flap (4)
+        gsap.to(cardImg, {
+          duration:0.7,
+          y: "-=10%",     // kleines Stück weiter ins Sichtfeld
+          ease: "power2.inOut"
+        });
+      });
+
+      // Karte: Phase 3 – in die Mitte, größer werden, ganz nach vorn
+      gsap.delayedCall(3.6, ()=>{
+        gsap.set(cardWrap, {zIndex:7}); // jetzt vor dem Umschlag
+        gsap.to(cardImg, {
+          duration:1.05,
           y: "0%",
           scale: 1.0,
-          rotation:45,
           ease: "power2.inOut"
         });
       });
@@ -267,26 +249,11 @@
       state = 2;
     }
 
-    function openDiamond(){
-      if(diamondOpen) return; diamondOpen = true;
-      gsap.to('.top',   {duration:1.0, rotationX:-180, transformOrigin:"50% 100%", ease:"power3.out"});
-      gsap.to('.bottom',{duration:1.0, rotationX: 180, transformOrigin:"50% 0%",   ease:"power3.out"});
-      gsap.to('.left',  {duration:1.0, rotationY:-180, transformOrigin:"100% 50%", ease:"power3.out"});
-      gsap.to('.right', {duration:1.0, rotationY: 180, transformOrigin:"0% 50%",   ease:"power3.out"});
-      gsap.to(inner,{duration:.65, opacity:1, delay:.75});
-      state = 3;
-    }
-
     /* ---- Interaction ---- */
     frame.addEventListener('click', ()=>{
       if(state===0) breakSealSlow();
       else if(state===1) openEnvelopeAndCardTwoStage();
     });
-    diamond.addEventListener('click', ()=>{ if(state===2) openDiamond(); });
-    diamond.addEventListener('keydown', (e)=>{ if((e.key==='Enter'||e.key===' ')&&state===2){ e.preventDefault(); openDiamond(); }});
-
-    // optionaler subtiler Hinweis auf dem intakten Siegel
-    gsap.fromTo('#sealIntact',{y:-2, opacity:.98},{y:2, opacity:1, duration:1.8, ease:"sine.inOut", yoyo:true, repeat:-1, repeatDelay:2.0});
   </script>
 </body>
 </html>
