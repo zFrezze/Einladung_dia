@@ -16,8 +16,8 @@
   body{
     margin:0;display:grid;place-items:center;
     background:linear-gradient(180deg,#f9fbff,#edf3fa);
-    font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--ink);
-    overflow:hidden;padding:18px
+    font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    color:var(--ink);overflow:hidden;padding:18px
   }
 
   /* ===== Umschlag ===== */
@@ -29,11 +29,8 @@
   }
   .env-liner{position:absolute;inset:0;border-radius:18px;z-index:1;opacity:0;background:linear-gradient(180deg,var(--liner-hi),var(--liner-lo))}
   .env-patch{position:absolute;inset:0;border-radius:18px;z-index:2;opacity:0;background:var(--liner-hi);clip-path:polygon(0 0,100% 0,50% 57%)}
-  .flap-top{
-    position:absolute;inset:0;z-index:4;clip-path:polygon(0 0,100% 0,50% 57%);
-    background:linear-gradient(180deg,#fff,#f3f7fb);transform-origin:50% 0%;
-    transform:rotateX(0deg)
-  }
+  .flap-top{position:absolute;inset:0;z-index:4;clip-path:polygon(0 0,100% 0,50% 57%);
+    background:linear-gradient(180deg,#fff,#f3f7fb);transform-origin:50% 0%;transform:rotateX(0deg)}
   .flap-shadow{position:absolute;left:8%;right:8%;top:52%;height:18px;z-index:3;
     background:radial-gradient(50% 100% at 50% 0%,rgba(0,0,0,.22),transparent 70%);opacity:.6}
 
@@ -44,19 +41,22 @@
   .seal-hh{position:absolute;inset:0;display:grid;place-items:center;font:700 30px/1 Georgia,serif;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.35)}
   canvas.seal-frag{position:absolute;inset:0;width:100%;height:100%;opacity:1;display:none}
 
-  /* ===== Karte ===== */
+  /* ===== Karte (Flip) ===== */
   .card-wrap{
     position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
     width:min(460px,76vmin);height:min(460px,76vmin);
     z-index:3;clip-path:polygon(0 0,100% 0,50% 57%);
   }
-  .card-img{
+  .card-flip{
     position:absolute;left:50%;top:50%;
     transform:translate(-50%,-50%) translateY(60%) scale(.48);
-    width:100%;height:auto;opacity:0.95;
+    width:100%;height:auto;transform-style:preserve-3d;
     filter: drop-shadow(0 30px 70px rgba(0,0,0,.25));
-    cursor:pointer;
+    cursor:pointer;user-select:none;
+    opacity:0;
   }
+  .card-face{position:absolute;left:0;top:0;width:100%;height:auto;backface-visibility:hidden;border-radius:12px}
+  .card-face.back{transform:rotateY(180deg)}
 </style>
 </head>
 <body>
@@ -75,7 +75,10 @@
     </div>
 
     <div class="card-wrap" id="cardWrap" aria-hidden="true">
-      <img src="diamond.jpg" alt="Einladungskarte" id="cardImg" class="card-img">
+      <div class="card-flip" id="cardFlip">
+        <img src="diamond.jpg" alt="Vorderseite" class="card-face front">
+        <img src="diamond_2.png" alt="Rückseite" class="card-face back">
+      </div>
     </div>
   </div>
 
@@ -90,9 +93,8 @@
     const sealIntact=document.getElementById('sealIntact');
     const sealHH=document.getElementById('sealHH');
     const cardWrap=document.getElementById('cardWrap');
-    const cardImg=document.getElementById('cardImg');
+    const cardFlip=document.getElementById('cardFlip');
 
-    // Siegel zerbrechen
     function breakSealSlow(){
       gsap.to(sealIntact,{
         duration:.18,scale:1.06,ease:"power2.out",yoyo:true,repeat:1,
@@ -101,7 +103,6 @@
       state=1;
     }
 
-    // Umschlag öffnen & Karte raus
     function openEnvelopeAndCardTwoStage(){
       gsap.to(flapTop,{duration:2,rotationX:-120,ease:"power2.inOut"});
       gsap.to(flapShadow,{duration:2,opacity:.2,y:-24,ease:"power2.inOut"});
@@ -109,9 +110,15 @@
       gsap.to(envPatch,{duration:.9,opacity:1,delay:.5});
 
       const tl=gsap.timeline({delay:0.95,defaults:{ease:"power2.inOut"}});
-      tl.to(cardImg,{duration:1.7,y:"-=90%",scale:.25,rotation:-8,opacity:1});
+      tl.to(cardFlip,{duration:1.7,y:"-=90%",scale:.25,rotation:-8,opacity:1});
       tl.add(()=>{document.querySelector('.card-wrap').style.clipPath='none'; gsap.set(cardWrap,{zIndex:7});});
-      tl.to(cardImg,{duration:1.6,y:"-50%",scale:1,rotation:0});
+      tl.to(cardFlip,{
+        duration:1.6,y:"-50%",scale:1,rotation:0,
+        onComplete:()=>{
+          // Flip automatisch nach 1.5s
+          gsap.to(cardFlip,{duration:1,rotateY:180,ease:"power2.inOut",delay:1.5});
+        }
+      });
       state=2;
     }
 
