@@ -227,32 +227,36 @@ function openEnvelopeAndCardTwoStage(){
   gsap.to(envLiner,  {duration:.9,  opacity:1, delay:.5, ease:"power1.out"});
   gsap.to(envPatch,  {duration:.9,  opacity:1, delay:.5, ease:"power1.out"});
 
-  // Timeline für Karte
+  // Timeline für die Karte (mit Kipp-Animation)
   const tl = gsap.timeline({ delay: 0.95, defaults:{ ease:"power2.inOut" } });
 
-  // 1) Durch die Öffnung fliegen – jetzt langsamer
+  // 1) Durch die Öffnung hoch – langsamer, kleiner, mit leichter Drehung
   tl.to(cardImg, {
-    duration: 1.7,   // vorher 0.7 → jetzt deutlich langsamer
-    y: "-=90%",      // kräftig hoch durchs Dreieck
+    duration: 1.7,
+    y: "-=90%",
     scale: 0.25,
+    rotation: -8,        // leicht nach links gekippt
+    transformOrigin: "50% 50%",
     opacity: 1
   });
 
-  // 2) Clip weg, Karte vor den Umschlag holen
+  // 2) Clip weg, Karte vor den Umschlag holen (bleibt noch leicht gekippt)
   tl.add(() => {
     document.querySelector('.card-wrap').style.clipPath = 'none';
     gsap.set(cardWrap, { zIndex: 7 });
   });
 
-  // 3) In die Mitte & größer – etwas höher enden
+  // 3) In die (höhere) Mitte fliegen und dabei langsam begradigen & größer werden
   tl.to(cardImg, {
-    duration: 1.6,   // länger fürs „Genießen“
-    y: "-50%",        // höher als 0%, zentriert etwas weiter oben
-    scale: 1.0
+    duration: 1.6,
+    y: "-50%",           // höher zentriert
+    scale: 1.0,
+    rotation: 0          // wieder gerade
   });
 
   state = 2;
 }
+
 
 
 
