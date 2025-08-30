@@ -14,32 +14,28 @@
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0;display:grid;place-items:center;background:linear-gradient(180deg,#f9fbff,#edf3fa);
+    margin:0;display:grid;place-items:center;
+    background:linear-gradient(180deg,#f9fbff,#edf3fa);
     font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--ink);
     overflow:hidden;padding:18px
   }
 
   /* ===== Umschlag ===== */
-  .env-frame{position:relative;width:min(700px,94vw);aspect-ratio:4/3;perspective:1800px;isolation:isolate;overflow:visible}
+  .env-frame{position:relative;width:min(700px,94vw);aspect-ratio:4/3;perspective:1800px;overflow:visible}
   .env-body{
-    position:absolute;inset:0;border-radius:18px;overflow:hidden;z-index:2;
-    background:
-      radial-gradient(140% 100% at 0% 50%, rgba(255,255,255,.90) 0%, transparent 60%),
-      radial-gradient(140% 100% at 100% 50%, rgba(0,0,0,.06) 0%, transparent 60%),
-      linear-gradient(180deg,var(--paper-hi) 0%, var(--paper-mid) 60%, var(--paper-lo) 100%);
+    position:absolute;inset:0;border-radius:18px;z-index:2;
+    background:linear-gradient(180deg,var(--paper-hi) 0%,var(--paper-mid) 60%,var(--paper-lo) 100%);
     box-shadow: var(--shadow-strong);
   }
   .env-liner{position:absolute;inset:0;border-radius:18px;z-index:1;opacity:0;background:linear-gradient(180deg,var(--liner-hi),var(--liner-lo))}
   .env-patch{position:absolute;inset:0;border-radius:18px;z-index:2;opacity:0;background:var(--liner-hi);clip-path:polygon(0 0,100% 0,50% 57%)}
   .flap-top{
-    position:absolute;inset:0;z-index:4;transform-style:preserve-3d;
-    background: linear-gradient(180deg,#ffffff 0%, #f3f7fb 100%);
-    border-top-left-radius:18px;border-top-right-radius:18px;
-    clip-path:polygon(0 0,100% 0,50% 57%);
-    transform-origin:50% 0%; transform:rotateX(0deg);
+    position:absolute;inset:0;z-index:4;clip-path:polygon(0 0,100% 0,50% 57%);
+    background:linear-gradient(180deg,#fff,#f3f7fb);transform-origin:50% 0%;
+    transform:rotateX(0deg)
   }
   .flap-shadow{position:absolute;left:8%;right:8%;top:52%;height:18px;z-index:3;
-    background:radial-gradient(50% 100% at 50% 0%, rgba(0,0,0,.22), transparent 70%);opacity:.6}
+    background:radial-gradient(50% 100% at 50% 0%,rgba(0,0,0,.22),transparent 70%);opacity:.6}
 
   /* ===== Siegel ===== */
   .seal-wrap{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);width:140px;height:140px;z-index:6}
@@ -48,20 +44,19 @@
   .seal-hh{position:absolute;inset:0;display:grid;place-items:center;font:700 30px/1 Georgia,serif;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.35)}
   canvas.seal-frag{position:absolute;inset:0;width:100%;height:100%;opacity:1;display:none}
 
-  /* ===== Karte (Flip) ===== */
+  /* ===== Karte ===== */
   .card-wrap{
     position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
     width:min(460px,76vmin);height:min(460px,76vmin);
-    z-index:3;pointer-events:none;clip-path:polygon(0 0,100% 0,50% 57%);
+    z-index:3;clip-path:polygon(0 0,100% 0,50% 57%);
   }
-  .card-flip{
-    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-    width:100%;height:auto;transform-style:preserve-3d;
+  .card-img{
+    position:absolute;left:50%;top:50%;
+    transform:translate(-50%,-50%) translateY(60%) scale(.48);
+    width:100%;height:auto;opacity:0.95;
     filter: drop-shadow(0 30px 70px rgba(0,0,0,.25));
-    cursor:pointer;user-select:none;opacity:0;
+    cursor:pointer;
   }
-  .card-face{position:absolute;left:0;top:0;width:100%;height:auto;backface-visibility:hidden;border-radius:12px}
-  .card-face.back{transform:rotateY(180deg)}
 </style>
 </head>
 <body>
@@ -80,10 +75,7 @@
     </div>
 
     <div class="card-wrap" id="cardWrap" aria-hidden="true">
-      <div class="card-flip" id="cardFlip">
-        <img src="diamond.jpg" alt="Vorderseite" class="card-face front">
-        <img src="diamond_2.png" alt="Rückseite" class="card-face back">
-      </div>
+      <img src="diamond.jpg" alt="Einladungskarte" id="cardImg" class="card-img">
     </div>
   </div>
 
@@ -98,20 +90,18 @@
     const sealIntact=document.getElementById('sealIntact');
     const sealHH=document.getElementById('sealHH');
     const cardWrap=document.getElementById('cardWrap');
-    const cardFlip=document.getElementById('cardFlip');
+    const cardImg=document.getElementById('cardImg');
 
-    // --- Siegel zerbrechen ---
+    // Siegel zerbrechen
     function breakSealSlow(){
       gsap.to(sealIntact,{
         duration:.18,scale:1.06,ease:"power2.out",yoyo:true,repeat:1,
-        onComplete(){
-          sealIntact.style.display='none'; sealHH.style.display='none';
-        }
+        onComplete(){ sealIntact.style.display='none'; sealHH.style.display='none'; }
       });
       state=1;
     }
 
-    // --- Umschlag öffnen & Karte raus ---
+    // Umschlag öffnen & Karte raus
     function openEnvelopeAndCardTwoStage(){
       gsap.to(flapTop,{duration:2,rotationX:-120,ease:"power2.inOut"});
       gsap.to(flapShadow,{duration:2,opacity:.2,y:-24,ease:"power2.inOut"});
@@ -119,23 +109,11 @@
       gsap.to(envPatch,{duration:.9,opacity:1,delay:.5});
 
       const tl=gsap.timeline({delay:0.95,defaults:{ease:"power2.inOut"}});
-      // Startposition setzen
-      tl.set(cardFlip,{yPercent:60,scale:.48,opacity:0});
-      // 1. Rausfliegen
-      tl.to(cardFlip,{duration:1.7,yPercent:-30,scale:.25,rotation:-8,opacity:1});
-      // Clip weg
+      tl.to(cardImg,{duration:1.7,y:"-=90%",scale:.25,rotation:-8,opacity:1});
       tl.add(()=>{document.querySelector('.card-wrap').style.clipPath='none'; gsap.set(cardWrap,{zIndex:7});});
-      // 2. In Mitte + größer
-      tl.to(cardFlip,{duration:1.6,yPercent:-50,scale:1,rotation:0});
+      tl.to(cardImg,{duration:1.6,y:"-50%",scale:1,rotation:0});
       state=2;
     }
-
-    // --- Flip bei Klick ---
-    cardFlip.addEventListener('click',()=>{
-      if(state===2){
-        gsap.to(cardFlip,{duration:1,rotateY:180,ease:"power2.inOut",delay:1.5});
-      }
-    });
 
     document.getElementById('frame').addEventListener('click',()=>{
       if(state===0) breakSealSlow();
