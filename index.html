@@ -7,89 +7,98 @@
 <style>
   :root{
     --ink:#0e1b2b;
-    --paper:#f6f8fb;
-    --paper-dark:#e9eef5;
-    --liner:#ffffff;
-    --liner-dark:#eef2f7;
-    --shadow-strong: 0 28px 80px rgba(12,24,40,.22);
-    --shadow-soft: 0 16px 40px rgba(12,24,40,.12);
-    --ease: cubic-bezier(.2,.8,.2,1);
+    --paper-hi:#ffffff;
+    --paper-mid:#eef2f7;
+    --paper-lo:#dfe6ee;
+    --liner-hi:#ffffff;
+    --liner-lo:#eaf0f7;
+    --shadow-strong: 0 30px 90px rgba(10,20,40,.28);
+    --shadow-soft:   0 16px 40px rgba(10,20,40,.14);
+    --edge: rgba(0,0,0,.16);
+    --ease-slow: cubic-bezier(.2,.7,.2,1);
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0;display:grid;place-items:center;background:linear-gradient(180deg,#ffffff,#eef4fa);
+    margin:0;display:grid;place-items:center;background:linear-gradient(180deg,#f9fbff,#edf3fa);
     font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--ink);
     overflow:hidden;padding:18px
   }
-  .hint{opacity:.8;font-size:.92rem;margin:0 0 12px;text-align:center}
+  .hint{opacity:.85;font-size:.94rem;margin:0 0 12px;text-align:center}
 
-  /* ===== Envelope (gebaut, kein Foto) ===== */
-  .env-frame{
-    position:relative;width:min(680px,94vw);aspect-ratio:4/3;perspective:1600px;isolation:isolate
-  }
-  /* Umschlag-Körper */
+  /* ===== Envelope (gebaut) – mehr Kontrast + Papierkörnung ===== */
+  .env-frame{position:relative;width:min(700px,94vw);aspect-ratio:4/3;perspective:1800px;isolation:isolate}
   .env-body{
-    position:absolute;inset:0;border-radius:16px;overflow:hidden;z-index:1;
+    position:absolute;inset:0;border-radius:18px;overflow:hidden;z-index:2;
     background:
-      linear-gradient(180deg,#fff 0%, var(--paper) 60%, var(--paper-dark) 100%);
+      /* Kantenlicht links/rechts */
+      radial-gradient(140% 100% at 0% 50%, rgba(255,255,255,.90) 0%, transparent 60%),
+      radial-gradient(140% 100% at 100% 50%, rgba(0,0,0,.06) 0%, transparent 60%),
+      /* Hauptverlauf Papier */
+      linear-gradient(180deg,var(--paper-hi) 0%, var(--paper-mid) 60%, var(--paper-lo) 100%);
     box-shadow: var(--shadow-strong);
   }
-  /* leichte seitliche Papierkanten */
-  .env-body::before,
+  /* dünner Innenrand für mehr Kontur */
+  .env-body::before{
+    content:"";position:absolute;inset:0;border-radius:18px;pointer-events:none;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.08), inset 0 18px 22px rgba(0,0,0,.05);
+  }
+  /* feine Papierkörnung */
   .env-body::after{
-    content:"";position:absolute;top:0;bottom:0;width:18px;pointer-events:none;mix-blend:multiply;opacity:.25
+    content:"";position:absolute;inset:0;pointer-events:none;opacity:.25;mix-blend:multiply;
+    background-image:
+      radial-gradient(1px 1px at 25% 30%, rgba(0,0,0,.05) 50%, transparent 51%),
+      radial-gradient(1px 1px at 60% 60%, rgba(0,0,0,.05) 50%, transparent 51%),
+      radial-gradient(1px 1px at 80% 20%, rgba(0,0,0,.05) 50%, transparent 51%),
+      radial-gradient(1px 1px at 40% 80%, rgba(0,0,0,.05) 50%, transparent 51%);
+    background-size: 120px 120px, 140px 140px, 160px 160px, 180px 180px;
   }
-  .env-body::before{left:0;background:linear-gradient(90deg, rgba(0,0,0,.08), transparent)}
-  .env-body::after{right:0;background:linear-gradient(270deg, rgba(0,0,0,.08), transparent)}
 
-  /* Innenfütterung (sichtbar wenn offen) */
+  /* Innenfutter */
   .env-liner{
-    position:absolute;inset:0;border-radius:16px;z-index:2;opacity:0;pointer-events:none;
-    background:linear-gradient(180deg,var(--liner),var(--liner-dark));
+    position:absolute;inset:0;border-radius:18px;z-index:1;opacity:0;pointer-events:none;
+    background:linear-gradient(180deg,var(--liner-hi),var(--liner-lo));
   }
-  /* Patch deckt die gedruckte Klappe im Body ab (Dreieck) – macht den offenen Look */
+  /* Patch deckt die (gedachte) Klappe im Body ab */
   .env-patch{
-    position:absolute;inset:0;border-radius:16px;z-index:2;opacity:0;pointer-events:none;
-    background:var(--liner);
-    clip-path:polygon(0 0,100% 0,50% 56.5%);
-    box-shadow:0 1px 0 rgba(0,0,0,.08) inset;
+    position:absolute;inset:0;border-radius:18px;z-index:3;opacity:0;pointer-events:none;
+    background:var(--liner-hi);
+    clip-path:polygon(0 0,100% 0,50% 57%);
+    box-shadow:0 1px 0 rgba(0,0,0,.10) inset;
   }
 
-  /* Top-Klappe klappt nach oben und BLEIBT sichtbar */
+  /* Top-Klappe – kräftiger Licht/Schatten, bleibt sichtbar */
   .flap-top{
-    position:absolute;inset:0;z-index:3;transform-style:preserve-3d;
+    position:absolute;inset:0;z-index:4;transform-style:preserve-3d;
     background:
-      linear-gradient(180deg,#fff 0%, #f4f7fb 100%);
-    border-top-left-radius:16px;border-top-right-radius:16px;
-    clip-path:polygon(0 0,100% 0,50% 56.5%);
+      linear-gradient(180deg,#ffffff 0%, #f3f7fb 100%);
+    border-top-left-radius:18px;border-top-right-radius:18px;
+    clip-path:polygon(0 0,100% 0,50% 57%);
     transform-origin:50% 0%; backface-visibility:visible; transform:rotateX(0deg);
-    box-shadow: 0 18px 40px rgba(0,0,0,.12);
+    box-shadow: 0 24px 50px rgba(0,0,0,.16);
   }
-  /* dezente Papierkante vorn */
   .flap-top::before{
-    content:""; position:absolute; inset:0; clip-path:inherit; border-top-left-radius:16px;border-top-right-radius:16px;
-    background:radial-gradient(160% 70% at 50% 30%, rgba(0,0,0,.12), transparent 50%);
-    mix-blend:multiply; opacity:.18; pointer-events:none;
+    content:""; position:absolute; inset:0; clip-path:inherit; border-top-left-radius:18px;border-top-right-radius:18px;
+    background:radial-gradient(160% 70% at 50% 30%, rgba(0,0,0,.18), transparent 55%);
+    mix-blend:multiply; opacity:.22; pointer-events:none;
   }
-  /* Rückseite der Klappe, sichtbar wenn sie kippt */
   .flap-top::after{
-    content:""; position:absolute; inset:0; clip-path:inherit; border-top-left-radius:16px;border-top-right-radius:16px;
-    background:linear-gradient(180deg,#ffffff,#eef2f7);
+    content:""; position:absolute; inset:0; clip-path:inherit; border-top-left-radius:18px;border-top-right-radius:18px;
+    background:linear-gradient(180deg,#ffffff,#e9eff6);
     transform:rotateY(180deg);
   }
 
-  /* Schatten unter Klappenkante */
+  /* Schattenkante unter Klappe */
   .flap-shadow{
-    position:absolute;left:8%;right:8%;top:52%;height:16px;z-index:2;
-    background:radial-gradient(50% 100% at 50% 0%, rgba(0,0,0,.18), transparent 70%);
-    filter:blur(2px);opacity:.55;pointer-events:none;
+    position:absolute;left:8%;right:8%;top:52%;height:18px;z-index:3;
+    background:radial-gradient(50% 100% at 50% 0%, rgba(0,0,0,.22), transparent 70%);
+    filter:blur(2px);opacity:.6;pointer-events:none;
   }
 
   /* ===== Seal (intakt + Canvas-Fragmente) ===== */
   .seal-wrap{
-    position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);
-    width:138px;height:138px;z-index:6
+    position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);
+    width:140px;height:140px;z-index:6
   }
   .seal-intact{position:absolute;inset:0;display:grid;place-items:center}
   .seal-intact img{width:100%;height:auto;display:block}
@@ -97,20 +106,27 @@
     position:absolute;inset:0;display:grid;place-items:center;
     font:700 30px/1 Georgia,serif;color:rgba(255,255,255,.96);text-shadow:0 2px 6px rgba(0,0,0,.35);pointer-events:none
   }
-  canvas.seal-frag{position:absolute;inset:0;width:100%;height:100%;opacity:0;pointer-events:none}
+  canvas.seal-frag{position:absolute;inset:0;width:100%;height:100%;opacity:1;pointer-events:none;display:none}
 
   /* ===== Diamond card ===== */
-  .diamond-wrap{position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);
-    width:min(460px,76vmin);height:min(460px,76vmin);z-index:5;pointer-events:none}
+  .diamond-wrap{
+    position:absolute;left:50%;top:74%;transform:translate(-50%,-50%);
+    width:min(460px,76vmin);height:min(460px,76vmin);
+    z-index:0; /* WICHTIG: zuerst hinter dem Umschlag! */
+    pointer-events:none;
+    overflow:visible;
+  }
   .diamond{
-    position:absolute;inset:0;transform:rotate(45deg) scale(.2);opacity:0;
+    position:absolute;inset:0;
+    transform:translateY(28%) rotate(45deg) scale(.35); /* tief unten, klein */
+    transform-origin:center; opacity:0;
     filter: drop-shadow(0 30px 70px rgba(0,0,0,.25));
     pointer-events:auto;cursor:pointer;
   }
   .piece{
     position:absolute;width:50%;height:50%;
     background:url("diamond.jpg") center/cover no-repeat;
-    border:1px solid rgba(0,0,0,.08);backface-visibility:hidden;transform-style:preserve-3d
+    border:1px solid rgba(0,0,0,.10);backface-visibility:hidden;transform-style:preserve-3d
   }
   .top{left:25%;top:0;transform-origin:50% 100%}
   .right{right:0;top:25%;transform-origin:0% 50%}
@@ -126,17 +142,17 @@
   .cta{margin-top:.6rem;display:inline-block;padding:.6rem .9rem;border-radius:12px;border:1px solid #dfe7f1;background:linear-gradient(#fff,#f6f9ff);text-decoration:none;color:#0a76cc;font-weight:600}
 
   @media (max-width:560px){
-    .seal-wrap{width:108px;height:108px}
+    .seal-wrap{width:112px;height:112px}
   }
 </style>
 </head>
 <body>
   <div>
-    <p class="hint">Klick 1: Siegel zersplittert · Klick 2: Klappe klappt nach oben & bleibt offen · Klick auf Diamant: Karte klappt auf</p>
+    <p class="hint">1) Siegel klick → pop & weg · 2) Klappe öffnet langsam · 3) Karte gleitet von hinten raus, in Mitte, vergrößert · 4) Diamant klick → aufklappen</p>
 
     <div class="env-frame" id="frame" role="region" aria-label="Einladung">
       <!-- Umschlag -->
-      <div class="env-body"></div>
+      <div class="env-body" id="envBody"></div>
       <div class="env-liner" id="envLiner"></div>
       <div class="env-patch" id="envPatch"></div>
       <div class="flap-top" id="flapTop" aria-hidden="true"></div>
@@ -148,7 +164,7 @@
           <img src="seal.png" alt="Wachssiegel">
           <div class="seal-hh" id="sealHH">HH</div>
         </div>
-        <!-- die Canvas-Fragmente werden per JS erzeugt (initial unsichtbar) -->
+        <!-- Canvas-Fragmente werden per JS erzeugt (initial display:none) -->
       </div>
 
       <!-- Diamant-Karte -->
@@ -174,7 +190,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script>
     /* ---------- State ---------- */
-    let state = 0;        // 0 start, 1 seal broken, 2 envelope open, 3 diamond open
+    let state = 0;        // 0 start, 1 seal gone, 2 envelope open, 3 diamond open
     let diamondOpen = false;
 
     /* ---------- DOM ---------- */
@@ -190,8 +206,7 @@
     const diamond = document.getElementById('diamond');
     const inner = document.getElementById('inner');
 
-    /* ---------- Seal fragments (hidden initially) ---------- */
-    // 4 Polygone (0..1) – so geschnitten, dass man sie theoretisch wieder zusammensetzen könnte
+    /* ---------- Seal fragments ---------- */
     const POLYS = [
       [ {x:.50,y:.10},{x:.86,y:.22},{x:.92,y:.40},{x:.70,y:.52},{x:.52,y:.42} ],
       [ {x:.52,y:.42},{x:.70,y:.52},{x:.64,y:.78},{x:.48,y:.90},{x:.42,y:.64} ],
@@ -204,27 +219,24 @@
     sealImg.onload = () => createSealFragments(sealImg);
 
     function createSealFragments(img){
-      // alte Fragmente weg
       Array.from(sealWrap.querySelectorAll('canvas.seal-frag')).forEach(n=>n.remove());
-      const size = Math.round(sealWrap.clientWidth || 138);
+      const size = Math.round(sealWrap.clientWidth || 140);
       POLYS.forEach(poly=>{
         const c = document.createElement('canvas');
         c.className = 'seal-frag';
         c.width = size; c.height = size;
+        c.style.display = 'none'; // initial unsichtbar
         sealWrap.appendChild(c);
         const g = c.getContext('2d');
 
-        // Clip auf Polygon
         g.save(); g.beginPath();
         poly.forEach((p,i)=>{ const x=p.x*size, y=p.y*size; i?g.lineTo(x,y):g.moveTo(x,y); });
         g.closePath(); g.clip();
 
-        // Bild als "cover" zeichnen
         const iw=img.width, ih=img.height, s=Math.max(size/iw, size/ih);
         g.drawImage(img,(size-iw*s)/2,(size-ih*s)/2, iw*s, ih*s);
         g.restore();
 
-        // dezente Relief-Schattierung
         g.globalCompositeOperation='multiply';
         g.fillStyle='rgba(0,0,0,.06)';
         g.beginPath();
@@ -234,49 +246,69 @@
     }
 
     /* ---------- Animations ---------- */
-    function breakSeal(){
-      // intaktes Bild kurz „atmen“ und ausfaden
-      gsap.to(sealIntact,{duration:.35, scale:.9, opacity:0, onComplete(){
+    function popSealGone(){
+      // kein Fade – kurzer „pop“ und dann sofort weg
+      // 1) Intaktes Bild: mini-bounce
+      gsap.fromTo(sealIntact, {scale:1}, {duration:.12, scale:1.08, ease:"power3.out", yoyo:true, repeat:1, onComplete(){
+        // 2) Intakt weg, Fragmente kurz sichtbar + kleiner Sprung, dann sofort entfernt
         sealIntact.style.display='none';
-        // Fragmente sichtbar & wegfliegen
+        sealHH.style.display='none';
         const frags = Array.from(sealWrap.querySelectorAll('canvas.seal-frag'));
         frags.forEach((c,i)=>{
-          c.style.opacity = 1;
+          c.style.display='block';
           const dir = [
-            {x:  1.0, y:-0.5, r: 22},
-            {x:  0.6, y: 1.0, r: 16},
-            {x: -0.8, y: 0.8, r:-20},
-            {x: -1.1, y:-0.2, r:-28},
-          ][i] || {x:(Math.random()-.5)*1.8, y:(Math.random()-.4)*1.4, r:(Math.random()-.5)*50};
-          const dist = 150 + Math.random()*100;
-
-          gsap.fromTo(c,{scale:1},{duration:.14,scale:1.04,yoyo:true,repeat:1});
-          gsap.to(c,{
-            duration:.95+Math.random()*.35,
-            x:dir.x*dist+(Math.random()*24-12),
-            y:dir.y*dist+(Math.random()*24-12),
-            rotation:dir.r+(Math.random()*16-8),
-            ease:"power2.in"
-          });
+            {x:  0.9, y:-0.4, r: 18},
+            {x:  0.5, y: 0.9, r: 14},
+            {x: -0.7, y: 0.7, r:-16},
+            {x: -1.0, y:-0.2, r:-20},
+          ][i] || {x:(Math.random()-.5)*1.4, y:(Math.random()-.4)*1.2, r:(Math.random()-.5)*40};
+          const dist = 60 + Math.random()*30; // kurz, knackig
+          gsap.to(c, {duration:.22, x:dir.x*dist, y:dir.y*dist, rotation:dir.r, ease:"power3.out"});
         });
-        // nach ~2.4s die Reste entfernen
-        setTimeout(()=>{ frags.forEach(c => gsap.to(c,{opacity:0, scale:.7, duration:.45, onComplete:()=>c.remove()})); }, 2400);
+        // 3) sofortiges Entfernen (kein Fade)
+        setTimeout(()=>{
+          frags.forEach(c => c.remove());
+          // Optionale winzige Staubidee könnte man hier adden
+        }, 230);
       }});
       state = 1;
     }
 
-    function openEnvelope(){
-      // Top-Klappe klappt nach oben und BLEIBT offen (nicht weiter als -120°, und backface sichtbar)
-      gsap.to(flapTop,{duration:1.0, rotationX:-120, ease:"power3.out"});
-      // Schatten passt sich an
-      gsap.to(flapShadow,{duration:1.0, opacity:.18, y:-28, ease:"power3.out"});
-      // Liner + Patch blenden ein -> „offen“-Look
-      gsap.to(envLiner,{duration:.5, opacity:1, delay:.25});
-      gsap.to(envPatch,{duration:.5, opacity:1, delay:.25});
+    function openEnvelopeSlow(){
+      // Langsam, genussvoll 😉
+      gsap.to(flapTop,{duration:1.8, rotationX:-120, ease: "power2.inOut"});
+      gsap.to(flapShadow,{duration:1.8, opacity:.20, y:-24, ease:"power2.inOut"});
+      gsap.to(envLiner ,{duration:.7,  opacity:1, delay:.4, ease:"power1.out"});
+      gsap.to(envPatch ,{duration:.7,  opacity:1, delay:.4, ease:"power1.out"});
 
-      // Diamant erscheint groß & zentriert (kleiner Rand bleibt)
-      diamondWrap.removeAttribute('aria-hidden');
-      gsap.to('.diamond',{duration:1.05, opacity:1, scale:1, rotation:45, ease:"back.out(1.25)"});
+      // Karte: ZUERST hinter dem Umschlag ein Stück herausgleiten (als würde man sie ziehen)
+      // Diamond ist aktuell zIndex:0 (hinter Body), wir bewegen sie hoch & leicht nach vorne (ohne über dem Body zu sein)
+      gsap.to(diamond, {
+        duration:1.2,
+        y: "-=52%",   // von unten nach oben (hinter dem Umschlag sichtbar dank Offsets)
+        opacity: 0.85,
+        ease: "power2.out",
+        delay: .8
+      });
+
+      // Danach nach vorne holen, in die Mitte und vergrößern
+      gsap.delayedCall(2.1, ()=>{
+        // jetzt vor den Umschlag
+        gsap.set(diamondWrap, {zIndex:7});
+        gsap.to(diamond, {
+          duration:0.9,
+          y: "0%",
+          opacity: 1,
+          ease: "power2.inOut"
+        });
+        gsap.to(diamond, {
+          duration:0.9,
+          scale:1,
+          rotation:45,
+          ease: "back.out(1.25)"
+        });
+      });
+
       state = 2;
     }
 
@@ -291,15 +323,14 @@
     }
 
     /* ---------- Interaction ---------- */
-    // 1. Klick: Siegel, 2. Klick: Klappe, Diamant separat
     frame.addEventListener('click', ()=>{
-      if(state===0) breakSeal();
-      else if(state===1) openEnvelope();
+      if(state===0) popSealGone();
+      else if(state===1) openEnvelopeSlow();
     });
     diamond.addEventListener('click', ()=>{ if(state===2) openDiamond(); });
     diamond.addEventListener('keydown', (e)=>{ if((e.key==='Enter'||e.key===' ')&&state===2){ e.preventDefault(); openDiamond(); }});
 
-    // dezenter Atme-Hinweis auf dem intakten Siegel
+    // dezenter Atme-Hinweis auf dem intakten Siegel (bis Klick)
     gsap.fromTo('#sealIntact',{y:-3, opacity:.98},{y:3, opacity:1, duration:1.6, ease:"sine.inOut", yoyo:true, repeat:-1, repeatDelay:2.0});
   </script>
 </body>
