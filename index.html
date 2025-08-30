@@ -209,7 +209,7 @@ function breakSealSlow(){
         const dist = 95 + Math.random()*40;
 
         // Bewegung
-        gsap.to(c, {duration:.55, x:dir.x*dist, y:dir.y*dist, rotation:dir.r, ease:"power2.out"});
+        gsap.to(c, {duration:.75, x:dir.x*dist, y:dir.y*dist, rotation:dir.r, ease:"power2.out"});
 
         // danach weich ausfaden
         gsap.to(c, {duration:.35, opacity:0, delay:.55, ease:"power2.out", onComplete:()=>c.remove()});
@@ -233,8 +233,8 @@ function openEnvelopeAndCardTwoStage(){
   // 1) Durch die Öffnung fliegen – jetzt langsamer
   tl.to(cardImg, {
     duration: 1.7,   // vorher 0.7 → jetzt deutlich langsamer
-    y: "-=80%",      // kräftig hoch durchs Dreieck
-    scale: 0.50,
+    y: "-=90%",      // kräftig hoch durchs Dreieck
+    scale: 0.45,
     opacity: 1
   });
 
