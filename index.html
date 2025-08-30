@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Einladung</title>
+<title>Einladung – Teil 1</title>
 <style>
   :root{
     --ink:#0e1b2b;
@@ -19,50 +19,59 @@
     overflow:hidden;padding:18px
   }
 
-  /* ===== Umschlag (wie Teil 1) ===== */
+  /* Umschlag */
   .env-frame{position:relative;width:min(700px,94vw);aspect-ratio:4/3;perspective:1800px;overflow:visible}
   .env-body{
     position:absolute;inset:0;border-radius:18px;z-index:2;overflow:hidden;
-    background:
-      radial-gradient(140% 100% at 0% 50%, rgba(255,255,255,.90) 0%, transparent 60%),
-      radial-gradient(140% 100% at 100% 50%, rgba(0,0,0,.06) 0%, transparent 60%),
-      linear-gradient(180deg,var(--paper-hi) 0%, var(--paper-mid) 60%, var(--paper-lo) 100%);
+    background:linear-gradient(180deg,var(--paper-hi) 0%, var(--paper-mid) 60%, var(--paper-lo) 100%);
     box-shadow: var(--shadow-strong);
   }
-  .env-liner{position:absolute;inset:0;border-radius:18px;z-index:1;opacity:0;pointer-events:none;background:linear-gradient(180deg,var(--liner-hi),var(--liner-lo))}
-  .env-patch{position:absolute;inset:0;border-radius:18px;z-index:2;opacity:0;pointer-events:none;background:var(--liner-hi);clip-path:polygon(0 0,100% 0,50% 57%)}
+  .env-liner{position:absolute;inset:0;border-radius:18px;z-index:1;opacity:0;background:linear-gradient(180deg,var(--liner-hi),var(--liner-lo))}
+  .env-patch{position:absolute;inset:0;border-radius:18px;z-index:2;opacity:0;background:var(--liner-hi);clip-path:polygon(0 0,100% 0,50% 57%)}
   .flap-top{
     position:absolute;inset:0;z-index:4;transform-style:preserve-3d;
     background: linear-gradient(180deg,#ffffff 0%, #f3f7fb 100%);
-    border-top-left-radius:18px;border-top-right-radius:18px;
     clip-path:polygon(0 0,100% 0,50% 57%);
     transform-origin:50% 0%; transform:rotateX(0deg);
-    box-shadow: 0 24px 50px rgba(0,0,0,.16);
   }
   .flap-shadow{position:absolute;left:8%;right:8%;top:52%;height:18px;z-index:3;
     background:radial-gradient(50% 100% at 50% 0%, rgba(0,0,0,.22), transparent 70%);opacity:.6}
 
-  /* ===== Siegel ===== */
+  /* Siegel */
   .seal-wrap{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);width:140px;height:140px;z-index:6}
-  .seal-intact{position:absolute;inset:0;display:grid;place-items:center}
   .seal-intact img{width:100%;height:auto;display:block}
 
-  /* ===== Karte (Flip-Container, aber gleicher „Hinausflug“ wie Teil 1) ===== */
+  /* Karte */
   .card-wrap{
     position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
     width:min(460px,76vmin);height:min(460px,76vmin);
-    z-index:3;pointer-events:none;overflow:visible;
-    clip-path:polygon(0 0,100% 0,50% 57%); /* nur Dreieck sichtbar – wie Teil 1 */
+    z-index:3;clip-path:polygon(0 0,100% 0,50% 57%);
   }
-  .card-flip{
-    position:absolute;left:50%;top:50%;
-    transform:translate(-50%,-50%); /* Start-Offsets setzen wir per GSAP, um Konflikte zu vermeiden */
-    width:100%;height:auto;opacity:0;
-    filter: drop-shadow(0 30px 70px rgba(0,0,0,.25));
-    transform-style:preserve-3d; /* 3D für Flip */
+  .card-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 1.5s;
   }
-  .card-face{position:absolute;left:0;top:0;width:100%;height:auto;backface-visibility:hidden;border-radius:12px}
-  .card-face.back{transform:rotateY(180deg)} /* Rückseite vorbereitet */
+  .card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 30px 70px rgba(0,0,0,.25);
+  }
+  .card-back {
+    transform: rotateY(180deg);
+  }
+  .card-img{
+    width:100%;
+    height:100%;
+    object-fit: cover;
+    display: block;
+  }
 </style>
 </head>
 <body>
@@ -76,81 +85,61 @@
     <!-- Siegel -->
     <div class="seal-wrap" id="sealWrap">
       <div class="seal-intact" id="sealIntact">
-        <img src="seal.png" alt="Siegel"><div class="seal-hh" style="position:absolute;inset:0;display:grid;place-items:center;font:700 30px/1 Georgia,serif;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.35)">HH</div>
+        <img src="seal.png" alt="Siegel"><div class="seal-hh">HH</div>
       </div>
     </div>
 
-    <!-- Karte (Front/Back) -->
+    <!-- Karte -->
     <div class="card-wrap" id="cardWrap" aria-hidden="true">
-      <div class="card-flip" id="cardFlip">
-        <img src="diamond.jpg"    alt="Vorderseite" class="card-face front">
-        <img src="diamond_2.png"  alt="Rückseite"  class="card-face back">
+      <div class="card-container" id="cardContainer">
+        <div class="card-front">
+          <img src="diamond.jpg" alt="Vorderseite der Einladungskarte" class="card-img">
+        </div>
+        <div class="card-back">
+          <img src="diamond_2.png" alt="Rückseite der Einladungskarte" class="card-img">
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- GSAP -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script>
     let state=0;
-    const flapTop   = document.getElementById('flapTop');
-    const flapShadow= document.getElementById('flapShadow');
-    const envLiner  = document.getElementById('envLiner');
-    const envPatch  = document.getElementById('envPatch');
-    const sealIntact= document.getElementById('sealIntact');
-    const cardWrap  = document.getElementById('cardWrap');
-    const cardFlip  = document.getElementById('cardFlip');
+    const flapTop=document.getElementById('flapTop');
+    const flapShadow=document.getElementById('flapShadow');
+    const envLiner=document.getElementById('envLiner');
+    const envPatch=document.getElementById('envPatch');
+    const sealIntact=document.getElementById('sealIntact');
+    const cardWrap=document.getElementById('cardWrap');
+    const cardContainer=document.getElementById('cardContainer');
 
-    /* === Teil 1 exakt: Siegel -> Umschlag -> Karte raus === */
     function breakSeal(){
-      gsap.to(sealIntact,{duration:.2, scale:1.08, yoyo:true, repeat:1, ease:"power2.out",
+      gsap.to(sealIntact,{
+        duration:.2,scale:1.08,yoyo:true,repeat:1,ease:"power2.out",
         onComplete:()=>{ sealIntact.style.display="none"; }
       });
       state=1;
     }
 
     function openEnvelopeAndCard(){
-      // Umschlag öffnet langsam
-      gsap.to(flapTop,   {duration:2.0, rotationX:-120, ease:"power2.inOut"});
-      gsap.to(flapShadow,{duration:2.0, opacity:.20, y:-24,   ease:"power2.inOut"});
-      gsap.to(envLiner,  {duration:.9,  opacity:1,   delay:.5});
-      gsap.to(envPatch,  {duration:.9,  opacity:1,   delay:.5});
+      gsap.to(flapTop,   {duration:2.0,rotationX:-120,ease:"power2.inOut"});
+      gsap.to(flapShadow,{duration:2.0,opacity:.20,y:-24,ease:"power2.inOut"});
+      gsap.to(envLiner,  {duration:.9, opacity:1, delay:.5});
+      gsap.to(envPatch,  {duration:.9, opacity:1, delay:.5});
 
-      // Karte: exakt gleicher Ablauf, nur mit yPercent/GSAP-Startwerten (keine CSS-Kollisionen)
-      const tl = gsap.timeline({delay:0.95, defaults:{ease:"power2.inOut"}});
-      tl.set(cardFlip,{yPercent:60, scale:0.48, opacity:0, rotation:0, rotateY:0}); // Start unten, klein, unsichtbar
-
-      // Phase 1 – hinter dem Umschlag durchs Dreieck nach oben (klein, leicht gekippt)
-      tl.to(cardFlip,{
-        duration:1.7,
-        yPercent:-30,       // von 60% nach -30% = kräftig hoch (wie früher y:"-=90%")
-        scale:0.25,
-        rotation:-8,
-        opacity:1
-      });
-
-      // Phase 2 – Clip weg, Karte vor den Umschlag holen
-      tl.add(()=>{
-        document.querySelector('.card-wrap').style.clipPath='none';
-        gsap.set(cardWrap,{zIndex:7});
-      });
-
-      // Phase 3 – in die (höhere) Mitte, dabei größer werden und gerade richten
-      tl.to(cardFlip,{
-        duration:1.6,
-        yPercent:-50,       // zentriert etwas höher (wie dein Stand)
-        scale:1.0,
-        rotation:0,
-        onComplete(){
-          // === Teil 2: Automatischer Flip nach 1.5s ===
-          gsap.to(cardFlip,{duration:1.0, rotateY:180, ease:"power2.inOut", delay:1.5});
-        }
-      });
-
+      const tl=gsap.timeline({delay:0.95,defaults:{ease:"power2.inOut"}});
+      tl.to(cardContainer,{duration:1.7,y:"-=90%",scale:.25,rotation:-8,opacity:1});
+      tl.add(()=>{document.querySelector('.card-wrap').style.clipPath='none'; gsap.set(cardWrap,{zIndex:7});});
+      tl.to(cardContainer,{duration:1.6,y:"-50%",scale:1.0,rotation:0});
+      // Nach 1.5 Sekunden die Karte umdrehen
+      tl.to(cardContainer, {duration: 0.01, onComplete: () => {
+        setTimeout(() => {
+          cardContainer.style.transform = "rotateY(180deg)";
+        }, 1500);
+      }});
       state=2;
     }
 
-    // Klicksteuerung wie gehabt (Teil 1)
     document.getElementById('frame').addEventListener('click',()=>{
       if(state===0) breakSeal();
       else if(state===1) openEnvelopeAndCard();
