@@ -222,44 +222,38 @@ function breakSealSlow(){
 
 function openEnvelopeAndCardTwoStage(){
   // Klappe langsam öffnen + Innenflächen
-  gsap.to(flapTop,{duration:2.0, rotationX:-120, ease:"power2.inOut"});
+  gsap.to(flapTop,   {duration:2.0, rotationX:-120, ease:"power2.inOut"});
   gsap.to(flapShadow,{duration:2.0, opacity:.20, y:-24, ease:"power2.inOut"});
-  gsap.to(envLiner ,{duration:.9,  opacity:1, delay:.5, ease:"power1.out"});
-  gsap.to(envPatch ,{duration:.9,  opacity:1, delay:.5, ease:"power1.out"});
+  gsap.to(envLiner,  {duration:.9,  opacity:1, delay:.5, ease:"power1.out"});
+  gsap.to(envPatch,  {duration:.9,  opacity:1, delay:.5, ease:"power1.out"});
 
-  // PHASE 1 — durch die Dreiecks-Öffnung sichtbar werden (geclippt), deutlich höher
-  gsap.to(cardImg, {
-    duration:1.9,
-    y: "-=44%",      // stärker nach oben
-    scale: 0.58,     // etwas größer, passt aber noch in die Öffnung
-    opacity: 0.98,
-    ease: "power2.inOut",
-    delay: 1.0
+  // Timeline für Karte
+  const tl = gsap.timeline({ delay: 0.95, defaults:{ ease:"power2.inOut" } });
+
+  // 1) Auf EINMAL durch die Öffnung (geclippt, kleiner, schnell)
+  tl.to(cardImg, {
+    duration: 0.7,
+    y: "-=60%",      // kräftig hoch durchs Dreieck
+    scale: 0.50,
+    opacity: 1
   });
 
-  // PHASE 2 — bis die Karte komplett im Kuvert sichtbar ist (immer noch geclippt)
-  gsap.to(cardImg, {
-    duration:0.9,
-    y: "-=22%",      // nochmal ein gutes Stück
-    scale: 0.64,     // minimal größer – passt weiterhin ins Dreieck
-    ease: "power2.inOut",
-    delay: 2.9
+  // 2) Clip weg, vor den Umschlag holen
+  tl.add(() => {
+    document.querySelector('.card-wrap').style.clipPath = 'none';
+    gsap.set(cardWrap, { zIndex: 7 });
   });
 
-  // PHASE 3 — Clip weg, Karte nach vorn, in die Mitte und groß
-  gsap.delayedCall(3.9, ()=>{
-    document.querySelector('.card-wrap').style.clipPath = 'none'; // ent-klippen
-    gsap.set(cardWrap, {zIndex:7});                                // vor den Umschlag
-    gsap.to(cardImg, {
-      duration:1.1,
-      y: "0%",
-      scale: 1.0,
-      ease: "power2.inOut"
-    });
+  // 3) In die Mitte fliegen und währenddessen vergrößern
+  tl.to(cardImg, {
+    duration: 1.15,
+    y: "0%",         // exakt zentriert (Wrap liegt bei top:50%)
+    scale: 1.00
   });
 
   state = 2;
 }
+
 
 
 
