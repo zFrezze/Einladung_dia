@@ -157,7 +157,7 @@
       const tl=gsap.timeline({delay:.95,defaults:{ease:"power2.inOut"}});
       tl.to([cardFront,cardBack],{duration:1.7,y:"-=90%",scale:.25,rotation:-8,opacity:1});
       tl.add(()=>{document.querySelector('.card-wrap').style.clipPath='none'});
-      tl.to([cardFront,cardBack],{duration:1.6,y:"-50%",scale:1.5,rotation:0});
+      tl.to([cardFront,cardBack],{duration:1.6,y:"-50%",scale:1.25,rotation:0});
       
       // automatischer Flip nach 1.5s
       tl.add(()=>{
