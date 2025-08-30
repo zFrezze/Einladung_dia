@@ -232,8 +232,8 @@ function openEnvelopeAndCardTwoStage(){
 
   // 1) Durch die Öffnung fliegen – jetzt langsamer
   tl.to(cardImg, {
-    duration: 1.5,   // vorher 0.7 → jetzt deutlich langsamer
-    y: "-=60%",      // kräftig hoch durchs Dreieck
+    duration: 2,   // vorher 0.7 → jetzt deutlich langsamer
+    y: "-=100%",      // kräftig hoch durchs Dreieck
     scale: 0.50,
     opacity: 1
   });
@@ -247,7 +247,7 @@ function openEnvelopeAndCardTwoStage(){
   // 3) In die Mitte & größer – etwas höher enden
   tl.to(cardImg, {
     duration: 1.6,   // länger fürs „Genießen“
-    y: "-8%",        // höher als 0%, zentriert etwas weiter oben
+    y: "-20%",        // höher als 0%, zentriert etwas weiter oben
     scale: 1.0
   });
 
