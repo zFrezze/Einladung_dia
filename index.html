@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Einladung – Teil 1</title>
+<title>Einladung – Teil 2</title>
 <style>
   :root{
     --ink:#0e1b2b;
@@ -19,71 +19,31 @@
     overflow:hidden;padding:18px
   }
 
-  /* Umschlag */
   .env-frame{position:relative;width:min(700px,94vw);aspect-ratio:4/3;perspective:1800px;overflow:visible}
-  .env-body{
-    position:absolute;inset:0;border-radius:18px;z-index:2;overflow:hidden;
-    background:linear-gradient(180deg,var(--paper-hi) 0%, var(--paper-mid) 60%, var(--paper-lo) 100%);
-    box-shadow: var(--shadow-strong);
-  }
-  .env-liner{position:absolute;inset:0;border-radius:18px;z-index:1;opacity:0;background:linear-gradient(180deg,var(--liner-hi),var(--liner-lo))}
-  .env-patch{position:absolute;inset:0;border-radius:18px;z-index:2;opacity:0;background:var(--liner-hi);clip-path:polygon(0 0,100% 0,50% 57%)}
-  .flap-top{
-    position:absolute;inset:0;z-index:4;transform-style:preserve-3d;
-    background: linear-gradient(180deg,#ffffff 0%, #f3f7fb 100%);
-    clip-path:polygon(0 0,100% 0,50% 57%);
-    transform-origin:50% 0%; transform:rotateX(0deg);
-  }
+  .env-body{position:absolute;inset:0;border-radius:18px;z-index:2;overflow:hidden;
+    background:linear-gradient(180deg,var(--paper-hi),var(--paper-mid) 60%,var(--paper-lo));box-shadow:var(--shadow-strong)}
+  .env-liner{position:absolute;inset:0;border-radius:18px;z-index:1;opacity:0;
+    background:linear-gradient(180deg,var(--liner-hi),var(--liner-lo))}
+  .env-patch{position:absolute;inset:0;border-radius:18px;z-index:2;opacity:0;
+    background:var(--liner-hi);clip-path:polygon(0 0,100% 0,50% 57%)}
+  .flap-top{position:absolute;inset:0;z-index:4;transform-style:preserve-3d;
+    background:linear-gradient(180deg,#ffffff,#f3f7fb);clip-path:polygon(0 0,100% 0,50% 57%);
+    transform-origin:50% 0%;transform:rotateX(0deg)}
   .flap-shadow{position:absolute;left:8%;right:8%;top:52%;height:18px;z-index:3;
     background:radial-gradient(50% 100% at 50% 0%, rgba(0,0,0,.22), transparent 70%);opacity:.6}
 
   /* Siegel */
-  .seal-wrap{
-    position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);
-    width:140px;height:140px;z-index:6;display:flex;justify-content:center;align-items:center;
-  }
-  .seal-intact{
-    width:100%;height:100%;border-radius:50%;background:#a83232;
-    box-shadow:0 5px 20px rgba(168,50,50,0.5), inset 0 0 0 8px rgba(255,255,255,0.3);
-    display:flex;justify-content:center;align-items:center;
-    position:relative;overflow:hidden;cursor:pointer;
-  }
-  .seal-intact:before{
-    content:'';position:absolute;width:100%;height:100%;
-    background:radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4) 0%, transparent 60%);
-  }
-  .seal-intact:after{
-    content:'';position:absolute;width:90%;height:90%;border-radius:50%;
-    border:2px dashed rgba(255,215,0,0.5);
-  }
-  .seal-hh{
-    font-family:'Times New Roman', serif;font-size:42px;font-weight:bold;
-    color:rgba(255,215,0,0.85);text-shadow:1px 1px 3px rgba(0,0,0,0.3);
-    letter-spacing:2px;
-  }
-  
+  .seal-wrap{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);
+    width:140px;height:140px;z-index:6;display:flex;justify-content:center;align-items:center}
+  .seal-intact img{width:100%;height:auto;cursor:pointer;user-select:none}
+
   /* Karte */
-  .card-wrap{
-    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-    width:min(460px,76vmin);height:min(460px,76vmin);
-    z-index:3;clip-path:polygon(0 0,100% 0,50% 57%);
-  }
-  .card-img{
-    position:absolute;left:50%;top:50%;
-    transform:translate(-50%,-50%) translateY(60%) scale(.48);
-    width:100%;height:auto;opacity:.95;
-    filter: drop-shadow(0 30px 70px rgba(0,0,0,.25));
-    cursor:pointer;user-select:none;
-    backface-visibility: hidden;
-  }
-  .card-back {
-    position:absolute;left:50%;top:50%;
-    transform:translate(-50%,-50%) translateY(60%) scale(.48) rotateY(180deg);
-    width:100%;height:auto;opacity:0;
-    filter: drop-shadow(0 30px 70px rgba(0,0,0,.25));
-    cursor:pointer;user-select:none;
-    backface-visibility: hidden;
-  }
+  .card-wrap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:min(460px,76vmin);height:min(460px,76vmin);z-index:3;clip-path:polygon(0 0,100% 0,50% 57%)}
+  .card-front,.card-back{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) translateY(60%) scale(.48);
+    width:100%;height:auto;opacity:.95;filter:drop-shadow(0 30px 70px rgba(0,0,0,.25));cursor:pointer;
+    user-select:none;backface-visibility:hidden}
+  .card-back{transform:translate(-50%,-50%) translateY(60%) scale(.48) rotateY(180deg);opacity:0}
 </style>
 </head>
 <body>
@@ -97,14 +57,14 @@
     <!-- Siegel -->
     <div class="seal-wrap" id="sealWrap">
       <div class="seal-intact" id="sealIntact">
-        <div class="seal-hh">HH</div>
+        <img src="seal.png" alt="Siegel">
       </div>
     </div>
 
     <!-- Karte -->
     <div class="card-wrap" id="cardWrap" aria-hidden="true">
-      <img src="https://images.unsplash.com/photo-1533924275610-4ff8475e8f15?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="Einladungskarte" id="cardImg" class="card-img">
-      <img src="https://images.unsplash.com/photo-1519457431-44ccd64a579b?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="Rückseite der Einladungskarte" id="cardBack" class="card-back">
+      <img src="diamond.jpg" alt="Vorderseite" id="cardFront" class="card-front">
+      <img src="diamond_2.png" alt="Rückseite" id="cardBack" class="card-back">
     </div>
   </div>
 
@@ -116,75 +76,36 @@
     const envLiner=document.getElementById('envLiner');
     const envPatch=document.getElementById('envPatch');
     const sealIntact=document.getElementById('sealIntact');
-    const cardWrap=document.getElementById('cardWrap');
-    const cardImg=document.getElementById('cardImg');
+    const cardFront=document.getElementById('cardFront');
     const cardBack=document.getElementById('cardBack');
 
     function breakSeal(){
-      // Erstellt mehrere Bruchstücke für den Siegelbruch-Effekt
-      const sealPieces = [];
-      const pieces = 5;
-      
-      for (let i = 0; i < pieces; i++) {
-        const piece = document.createElement('div');
-        piece.className = 'seal-piece';
-        piece.style.cssText = `
-          position: absolute;
-          width: 50%;
-          height: 50%;
-          background: #a83232;
-          border-radius: 50%;
-          top: ${25 + (i % 2) * 25}%;
-          left: ${25 + Math.floor(i / 2) * 25}%;
-          transform-origin: ${i % 2 ? 'left' : 'right'} ${Math.floor(i / 2) ? 'bottom' : 'top'};
-        `;
-        sealIntact.appendChild(piece);
-        sealPieces.push(piece);
+      const pieces=[];
+      for(let i=0;i<6;i++){
+        const p=document.createElement('div');
+        p.style.cssText="position:absolute;width:40px;height:40px;border-radius:50%;background:#a83232;left:50%;top:50%;";
+        sealIntact.appendChild(p);pieces.push(p);
       }
-      
-      // Animiert das Zerbrechen des Siegels
-      gsap.to(sealIntact, {
-        duration: 0.6,
-        scale: 1.2,
-        rotation: 15,
-        ease: "power2.out"
-      });
-      
-      gsap.to(sealPieces, {
-        duration: 0.8,
-        rotation: "+=60",
-        x: () => Math.random() * 100 - 50,
-        y: () => Math.random() * 100 - 50,
-        opacity: 0,
-        stagger: 0.05,
-        ease: "power2.out",
-        onComplete: () => {
-          sealIntact.style.display = "none";
-        }
-      });
-      
+      gsap.to(pieces,{duration:1.2,x:()=>Math.random()*200-100,y:()=>Math.random()*200-100,rotation:()=>Math.random()*180-90,opacity:0,stagger:0.05,ease:"power3.out",onComplete:()=>{sealIntact.style.display="none"}});
       state=1;
     }
 
     function openEnvelopeAndCard(){
-      gsap.to(flapTop,   {duration:2.0,rotationX:-120,ease:"power2.inOut"});
-      gsap.to(flapShadow,{duration:2.0,opacity:.20,y:-24,ease:"power2.inOut"});
-      gsap.to(envLiner,  {duration:.9, opacity:1, delay:.5});
-      gsap.to(envPatch,  {duration:.9, opacity:1, delay:.5});
+      gsap.to(flapTop,{duration:2,rotationX:-120,ease:"power2.inOut"});
+      gsap.to(flapShadow,{duration:2,opacity:.2,y:-24,ease:"power2.inOut"});
+      gsap.to(envLiner,{duration:.9,opacity:1,delay:.5});
+      gsap.to(envPatch,{duration:.9,opacity:1,delay:.5});
 
-      const tl=gsap.timeline({delay:0.95,defaults:{ease:"power2.inOut"}});
-      tl.to([cardImg, cardBack],{duration:1.7,y:"-=90%",scale:.25,rotation:-8,opacity:1});
-      tl.add(()=>{document.querySelector('.card-wrap').style.clipPath='none'; gsap.set(cardWrap,{zIndex:7});});
-      tl.to([cardImg, cardBack],{duration:1.6,y:"-50%",scale:1.0,rotation:0});
+      const tl=gsap.timeline({delay:.95,defaults:{ease:"power2.inOut"}});
+      tl.to([cardFront,cardBack],{duration:1.7,y:"-=90%",scale:.25,rotation:-8,opacity:1});
+      tl.add(()=>{document.querySelector('.card-wrap').style.clipPath='none'});
+      tl.to([cardFront,cardBack],{duration:1.6,y:"-50%",scale:1,rotation:0});
       
-      // Nach 1.5 Sekunden die Karte umdrehen
-      tl.add(() => {
-        setTimeout(() => {
-          gsap.to(cardImg, {duration: 1.0, rotationY: 180, opacity: 0});
-          gsap.to(cardBack, {duration: 1.0, rotationY: 0, opacity: 1, delay: 0.1});
-        }, 1500);
-      });
-      
+      // automatisches Umdrehen nach 1.5s
+      tl.add(()=>{setTimeout(()=>{
+        gsap.to(cardFront,{duration:1,rotationY:180,opacity:0});
+        gsap.to(cardBack,{duration:1,rotationY:0,opacity:1,delay:.1});
+      },1500)});
       state=2;
     }
 
