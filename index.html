@@ -1,146 +1,94 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Einladungskarte Animation</title>
-  <style>
-    /* Grundlayout und Hintergrund */
-    body {
-      margin: 0;
-      background: #e0e0e0; /* neutraler Hintergrund (entspricht dem Umschlag-Hintergrund) */
-      overflow: hidden;    /* verhindert Scrollen während Animation */
-    }
-    .wrapper {
-      position: relative;
-      width: 100%;
-      height: 100vh;
-      perspective: 800px;           /* Perspektive für 3D-Effekte (Umschlag & Karte) */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Einladung</title>
+<style>
+  body{
+    margin:0;display:grid;place-items:center;height:100vh;
+    background:linear-gradient(180deg,#f9fbff,#edf3fa);
+    overflow:hidden;
+  }
+  .env-frame{position:relative;width:min(700px,94vw);aspect-ratio:4/3;perspective:1800px}
+  .env-body{position:absolute;inset:0;border-radius:18px;background:#fff;box-shadow:0 30px 90px rgba(0,0,0,.28);z-index:2}
+  .flap-top{position:absolute;inset:0;clip-path:polygon(0 0,100% 0,50% 57%);
+    background:#f3f7fb;z-index:4;transform-origin:50% 0%;transform:rotateX(0deg)}
+  .flap-shadow{position:absolute;left:8%;right:8%;top:52%;height:18px;z-index:3;
+    background:radial-gradient(50% 100% at 50% 0%,rgba(0,0,0,.22),transparent 70%);opacity:.6}
 
-    /* Umschlag und Siegel */
-    .envelope-container {
-      position: absolute;
-      top: 60%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 600px;                /* angenommene Breite des Umschlags */
-      height: 400px;               /* angenommene Höhe des Umschlags */
-      transform-style: preserve-3d;/* Kinder in 3D-Raum (für die Hälften) */
-    }
-    .envelope-half {
-      position: absolute;
-      top: 0;
-      width: 50%;
-      height: 100%;
-      overflow: hidden;           /* nur eigener Bereich sichtbar (Bild wird halbiert) */
-    }
-    .envelope-half .envelope-img {
-      position: absolute;
-      top: 0;
-      /* volles Bild einfügen; durch Container-Hälfte und overflow:hidden wird es halb sichtbar */
-      /* keine Skalierung, wir nutzen das Originalbild und schneiden es durch Container zu */
-    }
-    .left-half {
-      left: 0;
-      transform-origin: 100% 50%; /* rechter Rand als Drehachse (Scharnier) */
-    }
-    .left-half .envelope-img {
-      left: 0;                    /* linke Hälfte des Bildes im linken Container sichtbar */
-    }
-    .right-half {
-      right: 0;
-      transform-origin: 0% 50%;   /* linker Rand als Drehachse (Scharnier) */
-    }
-    .right-half .envelope-img {
-      right: 0;                   /* rechte Hälfte des Bildes im rechten Container sichtbar */
-    }
-    .seal {
-      position: absolute;
-      width: 60px;
-      height: 60px;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 2;                 /* über den Umschlagteilen und Karte */
-      cursor: pointer;            /* Klickbarer Bereich für Start */
-    }
+  /* Siegel */
+  .seal-wrap{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);width:140px;height:140px;z-index:6}
+  .seal-intact img{width:100%;height:auto}
 
-    /* Karte (Vorder- und Rückseite) */
-    .card-container {
-      position: absolute;
-      top: 60%; 
-      left: 50%;
-      transform: translate(-50%, -50%);
-      transform-style: preserve-3d;  /* ermöglicht 3D-Drehung der Kinder */
-      z-index: 1;                    /* unter Umschlagteilen anfangs */
-    }
-    .card-container img {
-      display: block;
-      width: auto;
-      height: auto;
-      /* Die tatsächliche Größe der Karte wird durch die Bildgröße bestimmt */
-    }
-    .card.front {
-      /* Vorderseite der Karte */
-      backface-visibility: hidden;   /* Rückseite ausblenden, wenn umgedreht */
-    }
-    .card.back {
-      position: absolute;
-      top: 0;
-      left: 0;
-      backface-visibility: hidden;
-      transform: rotateY(180deg);    /* Rückseite initial 180° gedreht (unsichtbar) */
-    }
-  </style>
+  /* Karte (Flip) */
+  .card-wrap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:min(460px,76vmin);height:min(460px,76vmin);z-index:3;
+    clip-path:polygon(0 0,100% 0,50% 57%)}
+  .card-flip{
+    position:absolute;left:50%;top:50%;
+    transform:translate(-50%,-50%) translateY(60%) scale(.48);
+    width:100%;height:auto;opacity:.95;
+    filter:drop-shadow(0 30px 70px rgba(0,0,0,.25));
+    transform-style:preserve-3d;
+  }
+  .card-face{position:absolute;left:0;top:0;width:100%;backface-visibility:hidden;border-radius:12px}
+  .card-face.back{transform:rotateY(180deg)}
+</style>
 </head>
 <body>
+  <div class="env-frame" id="frame">
+    <div class="env-body"></div>
+    <div class="flap-top" id="flapTop"></div>
+    <div class="flap-shadow" id="flapShadow"></div>
 
-  <div class="wrapper">
-    <!-- Umschlag (zweigeteilt in zwei Hälften) mit Siegel -->
-    <div class="envelope-container">
-      <div class="envelope-half left-half">
-        <img src="envelope.jpg" alt="Umschlag links" class="envelope-img" />
+    <!-- Siegel -->
+    <div class="seal-wrap" id="sealWrap">
+      <div class="seal-intact" id="sealIntact">
+        <img src="seal.png" alt="Siegel"><div class="seal-hh">HH</div>
       </div>
-      <div class="envelope-half right-half">
-        <img src="envelope.jpg" alt="Umschlag rechts" class="envelope-img" />
-      </div>
-      <img src="seal.png" alt="Wachssiegel" class="seal" />
     </div>
-    <!-- Karte mit Vorder- und Rückseite -->
-    <div class="card-container">
-      <img src="diamond.jpg" alt="Einladungskarte Vorderseite" class="card front" />
-      <img src="diamond_2.png" alt="Einladungskarte Rückseite" class="card back" />
+
+    <!-- Karte -->
+    <div class="card-wrap" id="cardWrap" aria-hidden="true">
+      <div class="card-flip" id="cardImg">
+        <img src="diamond.jpg"   class="card-face front" alt="Vorderseite">
+        <img src="diamond_2.png" class="card-face back"  alt="Rückseite">
+      </div>
     </div>
   </div>
 
-  <!-- GSAP CDN einbinden -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script>
-    // Initiale Einstellungen für 3D-Elemente
-    gsap.set(".envelope-img", { backfaceVisibility: "hidden" }); // Rückseite der Umschlaghälften ausblenden
-    gsap.set(".card-container", { transformStyle: "preserve-3d" }); // Sicherstellen, dass Karte 3D-transformierbar ist
-    gsap.set(".card.back", { rotationY: 180 }); // Rückseitenbild 180° gedreht (zeigt nach "hinten")
+    let state=0;
+    const flapTop=document.getElementById('flapTop');
+    const flapShadow=document.getElementById('flapShadow');
+    const sealIntact=document.getElementById('sealIntact');
+    const cardWrap=document.getElementById('cardWrap');
+    const cardImg=document.getElementById('cardImg');
 
-    // GSAP Timeline für die gesamte Sequenz
-    const tl = gsap.timeline({ paused: true });
+    function breakSeal(){
+      gsap.to(sealIntact,{duration:.2,scale:1.1,yoyo:true,repeat:1,onComplete:()=>sealIntact.style.display="none"});
+      state=1;
+    }
 
-    // 1. Siegel zerbricht (skaliert und verblasst schnell)
-    tl.to(".seal", { duration: 0.3, opacity: 0, scale: 0, ease: "power1.in" })
-      // 2. Umschlag klappt in zwei Hälften auf
-      .to(".left-half",  { duration: 0.5, rotationY: -90, ease: "power2.in" }, "+=0")
-      .to(".right-half", { duration: 0.5, rotationY:  90, ease: "power2.in" }, "<")  // "<" startet zeitgleich mit linker Hälfte
-      // 3. Karte fliegt nach oben und wird zentriert (leicht überlappend während Umschlag sich öffnet)
-      .to(".card-container", { duration: 0.8, top: "50%", ease: "power2.out", scale: 1 }, "-=0.3")
-      // 4. Automatischer Flip zur Rückseite nach 1,5s Wartezeit
-      .to(".card-container", { duration: 1.0, rotationY: 180, ease: "power2.inOut" }, "+=1.5");
+    function openEnvelopeAndCard(){
+      gsap.to(flapTop,{duration:2,rotationX:-120,ease:"power2.inOut"});
+      gsap.to(flapShadow,{duration:2,opacity:.2,y:-24,ease:"power2.inOut"});
 
-    // Timeline durch Klick auf das Siegel starten
-    document.querySelector(".seal").addEventListener("click", function() {
-      tl.play();
+      const tl=gsap.timeline({delay:.95,defaults:{ease:"power2.inOut"}});
+      tl.to(cardImg,{duration:1.7,y:"-=90%",scale:.25,rotation:-8,opacity:1});
+      tl.add(()=>{document.querySelector('.card-wrap').style.clipPath='none'; gsap.set(cardWrap,{zIndex:7});});
+      tl.to(cardImg,{duration:1.6,y:"-50%",scale:1,rotation:0,onComplete:()=>{
+        // Auto Flip nach 1,5 s
+        gsap.to(cardImg,{duration:1,rotateY:180,ease:"power2.inOut",delay:1.5});
+      }});
+      state=2;
+    }
+
+    document.getElementById('frame').addEventListener('click',()=>{
+      if(state===0) breakSeal();
+      else if(state===1) openEnvelopeAndCard();
     });
   </script>
 </body>
