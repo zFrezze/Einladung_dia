@@ -5,86 +5,53 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Einladung</title>
 <style>
-  :root{
-    --ink:#0e1b2b;
-    --paper-hi:#ffffff; --paper-mid:#eef2f7; --paper-lo:#dfe6ee;
-    --liner-hi:#ffffff; --liner-lo:#eaf0f7;
-    --shadow-strong: 0 30px 90px rgba(10,20,40,.28);
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
   body{
-    margin:0;display:grid;place-items:center;
+    margin:0;display:grid;place-items:center;height:100vh;
     background:linear-gradient(180deg,#f9fbff,#edf3fa);
-    font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-    color:var(--ink);overflow:hidden;padding:18px
   }
-
-  /* ===== Umschlag ===== */
-  .env-frame{position:relative;width:min(700px,94vw);aspect-ratio:4/3;perspective:1800px;overflow:visible}
-  .env-body{
-    position:absolute;inset:0;border-radius:18px;z-index:2;
-    background:linear-gradient(180deg,var(--paper-hi) 0%,var(--paper-mid) 60%,var(--paper-lo) 100%);
-    box-shadow: var(--shadow-strong);
-  }
-  .env-liner{position:absolute;inset:0;border-radius:18px;z-index:1;opacity:0;background:linear-gradient(180deg,var(--liner-hi),var(--liner-lo))}
-  .env-patch{position:absolute;inset:0;border-radius:18px;z-index:2;opacity:0;background:var(--liner-hi);clip-path:polygon(0 0,100% 0,50% 57%)}
-  .flap-top{position:absolute;inset:0;z-index:4;clip-path:polygon(0 0,100% 0,50% 57%);
-    background:linear-gradient(180deg,#fff,#f3f7fb);transform-origin:50% 0%;transform:rotateX(0deg)}
+  .env-frame{position:relative;width:min(700px,94vw);aspect-ratio:4/3;perspective:1800px}
+  .env-body{position:absolute;inset:0;border-radius:18px;background:#fff;box-shadow:0 30px 90px rgba(0,0,0,.28);z-index:2}
+  .flap-top{position:absolute;inset:0;clip-path:polygon(0 0,100% 0,50% 57%);
+    background:#f3f7fb;z-index:4;transform-origin:50% 0%;transform:rotateX(0deg)}
   .flap-shadow{position:absolute;left:8%;right:8%;top:52%;height:18px;z-index:3;
-    background:radial-gradient(50% 100% at 50% 0%,rgba(0,0,0,.22),transparent 70%);opacity:.6}
+    background:radial-gradient(50% 100% at 50% 0%,rgba(0,0,0,.22),transparent 70%)}
 
-  /* ===== Siegel ===== */
+  /* Siegel */
   .seal-wrap{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);width:140px;height:140px;z-index:6}
-  .seal-intact{position:absolute;inset:0;display:grid;place-items:center}
   .seal-intact img{width:100%;height:auto}
-  .seal-hh{position:absolute;inset:0;display:grid;place-items:center;font:700 30px/1 Georgia,serif;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.35)}
-  canvas.seal-frag{position:absolute;inset:0;width:100%;height:100%;opacity:0;display:block;pointer-events:none}
 
-  /* ===== Karte (Flip-Container aber mit gleichem „Hinausflug“) ===== */
-  .card-wrap{
-    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-    width:min(460px,76vmin);height:min(460px,76vmin);
-    z-index:3;clip-path:polygon(0 0,100% 0,50% 57%);
-  }
-  /* WICHTIG: Wir lassen die Start-Transforms wie im funktionierenden Teil 1 */
-  .card-img{
+  /* Karte (Flip-Container = #cardImg) */
+  .card-wrap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:min(460px,76vmin);height:min(460px,76vmin);z-index:3;clip-path:polygon(0 0,100% 0,50% 57%)}
+  #cardImg{
     position:absolute;left:50%;top:50%;
-    transform:translate(-50%,-50%) translateY(60%) scale(.48); /* Start wie früher */
-    width:100%;height:auto;opacity:.95;
-    filter: drop-shadow(0 30px 70px rgba(0,0,0,.25));
-    /* Für Flip: */
-    transform-style:preserve-3d; backface-visibility:hidden; cursor:default;
+    transform:translate(-50%,-50%) translateY(60%) scale(.48);
+    width:100%;height:auto;opacity:0.95;
+    filter:drop-shadow(0 30px 70px rgba(0,0,0,.25));
+    transform-style:preserve-3d;
   }
-  .card-face{position:absolute;left:0;top:0;width:100%;height:auto;backface-visibility:hidden;border-radius:12px}
+  .card-face{position:absolute;left:0;top:0;width:100%;backface-visibility:hidden;border-radius:12px}
   .card-face.back{transform:rotateY(180deg)}
 </style>
 </head>
 <body>
   <div class="env-frame" id="frame">
     <div class="env-body"></div>
-    <div class="env-liner" id="envLiner"></div>
-    <div class="env-patch" id="envPatch"></div>
     <div class="flap-top" id="flapTop"></div>
     <div class="flap-shadow" id="flapShadow"></div>
 
+    <!-- Siegel -->
     <div class="seal-wrap" id="sealWrap">
       <div class="seal-intact" id="sealIntact">
-        <img src="seal.png" alt="Siegel">
-        <div class="seal-hh" id="sealHH">HH</div>
+        <img src="seal.png" alt="Siegel"><div class="seal-hh">HH</div>
       </div>
-      <!-- Splitter werden per JS erzeugt -->
-      <canvas class="seal-frag" width="140" height="140"></canvas>
-      <canvas class="seal-frag" width="140" height="140"></canvas>
-      <canvas class="seal-frag" width="140" height="140"></canvas>
-      <canvas class="seal-frag" width="140" height="140"></canvas>
     </div>
 
+    <!-- Karte -->
     <div class="card-wrap" id="cardWrap" aria-hidden="true">
-      <!-- Flip-Container heisst weiterhin cardImg, damit die alte Animation unverändert bleibt -->
-      <div class="card-img" id="cardImg">
-        <img src="diamond.jpg"   alt="Vorderseite" class="card-face front">
-        <img src="diamond_2.png" alt="Rückseite"  class="card-face back">
+      <div id="cardImg">
+        <img src="diamond.jpg"   class="card-face front" alt="Vorderseite">
+        <img src="diamond_2.png" class="card-face back"  alt="Rückseite">
       </div>
     </div>
   </div>
@@ -94,88 +61,30 @@
     let state=0;
     const flapTop=document.getElementById('flapTop');
     const flapShadow=document.getElementById('flapShadow');
-    const envLiner=document.getElementById('envLiner');
-    const envPatch=document.getElementById('envPatch');
-    const sealWrap=document.getElementById('sealWrap');
     const sealIntact=document.getElementById('sealIntact');
-    const sealHH=document.getElementById('sealHH');
     const cardWrap=document.getElementById('cardWrap');
-    const cardImg=document.getElementById('cardImg'); // bleibt Ziel der bestehenden Animation
-
-    /* ========== Siegel: realistische Splitter mit Fade ========== */
-    const POLYS = [
-      [ {x:.50,y:.10},{x:.86,y:.22},{x:.92,y:.40},{x:.70,y:.52},{x:.52,y:.42} ],
-      [ {x:.52,y:.42},{x:.70,y:.52},{x:.64,y:.78},{x:.48,y:.90},{x:.42,y:.64} ],
-      [ {x:.42,y:.64},{x:.48,y:.90},{x:.22,y:.84},{x:.14,y:.62},{x:.28,y:.48} ],
-      [ {x:.28,y:.48},{x:.14,y:.62},{x:.10,y:.38},{x:.28,y:.22},{x:.50,y:.10} ],
-    ];
-    const sealImg = new Image();
-    sealImg.src = "seal.png";
-    sealImg.onload = () => {
-      const size = 140;
-      const frags = Array.from(sealWrap.querySelectorAll('canvas.seal-frag'));
-      frags.forEach((c,i)=>{
-        const g=c.getContext('2d'); c.width=size; c.height=size;
-        const poly=POLYS[i];
-        g.save(); g.beginPath();
-        poly.forEach((p,j)=>{const x=p.x*size,y=p.y*size; j?g.lineTo(x,y):g.moveTo(x,y);});
-        g.closePath(); g.clip();
-        const iw=sealImg.width, ih=sealImg.height, s=Math.max(size/iw,size/ih);
-        g.drawImage(sealImg,(size-iw*s)/2,(size-ih*s)/2, iw*s, ih*s); g.restore();
-        g.globalCompositeOperation='multiply'; g.fillStyle='rgba(0,0,0,.06)';
-        g.beginPath(); poly.forEach((p,j)=>{const x=p.x*size,y=p.y*size; j?g.lineTo(x,y):g.moveTo(x,y);}); g.closePath(); g.fill();
-      });
-    };
+    const cardImg=document.getElementById('cardImg');
 
     function breakSealSlow(){
-      // Bounce + Splitter raus + Fade
-      gsap.to(sealIntact,{
-        duration:.18,scale:1.06,ease:"power2.out",yoyo:true,repeat:1,
-        onComplete(){
-          sealIntact.style.display='none'; sealHH.style.display='none';
-          const frags = Array.from(sealWrap.querySelectorAll('canvas.seal-frag'));
-          frags.forEach((c,i)=>{
-            c.style.opacity=1;
-            const dir = [
-              {x: 0.85, y:-0.40, r: 16},
-              {x: 0.55, y: 0.85, r: 12},
-              {x:-0.70, y: 0.70, r:-14},
-              {x:-0.95, y:-0.20, r:-18},
-            ][i] || {x:(Math.random()-.5)*1.2,y:(Math.random()-.4)*1.0,r:(Math.random()-.5)*36};
-            const dist = 95 + Math.random()*40;
-            gsap.to(c,{duration:.75,x:dir.x*dist,y:dir.y*dist,rotation:dir.r,ease:"power2.out"});
-            gsap.to(c,{duration:.35,opacity:0,delay:.55,ease:"power2.out",onComplete:()=>c.remove()});
-          });
-        }
-      });
+      gsap.to(sealIntact,{duration:.2,scale:1.1,yoyo:true,repeat:1,onComplete:()=>sealIntact.style.display="none"});
       state=1;
     }
 
-    /* ========== Umschlag öffnen & Karte raus (unverändert) ========== */
     function openEnvelopeAndCardTwoStage(){
       gsap.to(flapTop,{duration:2,rotationX:-120,ease:"power2.inOut"});
       gsap.to(flapShadow,{duration:2,opacity:.2,y:-24,ease:"power2.inOut"});
-      gsap.to(envLiner,{duration:.9,opacity:1,delay:.5});
-      gsap.to(envPatch,{duration:.9,opacity:1,delay:.5});
 
-      const tl=gsap.timeline({delay:0.95,defaults:{ease:"power2.inOut"}});
-      // 1) durch Dreieck hoch (genau wie vorher)
+      const tl=gsap.timeline({delay:.95,defaults:{ease:"power2.inOut"}});
+      // rausfliegen wie vorher
       tl.to(cardImg,{duration:1.7,y:"-=90%",scale:.25,rotation:-8,opacity:1});
-      // 2) Clip weg, Karte vor den Umschlag
       tl.add(()=>{document.querySelector('.card-wrap').style.clipPath='none'; gsap.set(cardWrap,{zIndex:7});});
-      // 3) In die (höhere) Mitte & größer
-      tl.to(cardImg,{
-        duration:1.6,y:"-50%",scale:1,rotation:0,
-        onComplete(){
-          // ========== Automatischer Flip nach 1.5s ==========
-          gsap.to(cardImg,{duration:1, rotateY:180, ease:"power2.inOut", delay:1.5});
-        }
-      });
-
+      tl.to(cardImg,{duration:1.6,y:"-50%",scale:1,rotation:0,onComplete:()=>{
+        // automatischer Flip
+        gsap.to(cardImg,{duration:1,rotateY:180,ease:"power2.inOut",delay:1.5});
+      }});
       state=2;
     }
 
-    // Klick-Logik: 1) Siegel, 2) Umschlag+Karte
     document.getElementById('frame').addEventListener('click',()=>{
       if(state===0) breakSealSlow();
       else if(state===1) openEnvelopeAndCardTwoStage();
